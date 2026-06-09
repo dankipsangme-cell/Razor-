@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Razor Chart — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --gold:#D4A017;--gold-l:#F5C842;--gold-d:#8a6510;
+  --black:#050608;--dark:#0d0f14;--card:#111420;--card2:#161924;
+  --border:rgba(212,160,23,.18);--border2:rgba(255,255,255,.06);
+  --text:#e8e4d8;--muted:#6b7180;--muted2:#4a4f60;
+  --green:#1FD67A;--red:#F04E4E;--blue:#4A9EFF;
+  --r:14px;--r2:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(212,160,23,.09) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 5% 100%,rgba(212,160,23,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.03) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+/* ══ DESKTOP SPLIT AUTH LAYOUT ══════════════════════════════════ */
+#auth-page{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-outer{width:100%;max-width:1100px;display:flex;align-items:stretch;gap:52px}
+.auth-hero{flex:1;display:none;flex-direction:column;justify-content:center;padding:8px 0}
+.auth-right{width:100%;max-width:440px;flex-shrink:0}
+@media(min-width:900px){
+  .auth-hero{display:flex}
+  .auth-right{width:440px}
+  #auth-page{align-items:center;padding:40px 32px}
+}
+
+/* HERO CONTENT */
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.22);border-radius:50px;padding:5px 14px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--gold);letter-spacing:.5px;margin-bottom:22px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
+.hero-headline{font-size:clamp(2rem,3.5vw,2.9rem);font-weight:800;line-height:1.12;letter-spacing:-1.5px;margin-bottom:14px}
+.hero-headline .hl-gold{color:var(--gold)}
+.hero-headline .hl-line2{display:block}
+.hero-sub{font-size:.95rem;color:var(--muted);line-height:1.7;margin-bottom:32px;max-width:400px}
+
+/* KEY STATS */
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.hs-card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:16px 14px;position:relative;overflow:hidden}
+.hs-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+.hs-val{font-size:1.4rem;font-weight:800;color:var(--gold-l);font-family:'Space Mono',monospace;margin-bottom:3px;letter-spacing:-1px}
+.hs-val.green{color:var(--green)}
+.hs-val.blue{color:var(--blue)}
+.hs-label{font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.4px;line-height:1.4}
+
+/* MINI TESTIMONIALS */
+.hero-testi-label{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:10px}
+.hero-testis{display:flex;flex-direction:column;gap:8px}
+.hero-testi{display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 14px}
+.ht-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}
+.ht-body{}
+.ht-name{font-size:.78rem;font-weight:700;margin-bottom:1px}
+.ht-loc{font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:4px}
+.ht-quote{font-size:.72rem;color:var(--muted);line-height:1.5;font-style:italic}
+.ht-amount{display:inline-block;font-size:.65rem;font-family:'Space Mono',monospace;color:var(--green);font-weight:700;margin-top:4px}
+
+/* TRUST BADGE ROW */
+.hero-trust{display:flex;align-items:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.trust-badge{display:flex;align-items:center;gap:5px;font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.trust-badge span:first-child{font-size:.9rem}
+.trust-divider{width:1px;height:14px;background:rgba(255,255,255,.1)}
+
+/* ENHANCED WITHDRAW MODAL */
+.w-breakdown{background:rgba(31,214,122,.06);border:1px solid rgba(31,214,122,.18);border-radius:12px;padding:16px;margin-bottom:18px}
+.w-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:.82rem}
+.w-breakdown-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,.05)}
+.wbr-label{color:var(--muted);font-family:'Space Mono',monospace;font-size:.72rem}
+.wbr-val{font-weight:700;color:var(--text)}
+.wbr-val.green{color:var(--green);font-size:.9rem}
+.wbr-val.gold{color:var(--gold-l)}
+.w-mpesa-code-field{margin-bottom:14px}
+.w-mpesa-code-field label{display:block;font-size:.7rem;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;letter-spacing:.5px}
+.w-code-hint{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.6;margin-top:5px}
+.w-code-hint strong{color:var(--gold)}
+.w-status-badge{display:flex;align-items:center;gap:8px;background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.2);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+.w-status-icon{font-size:1.1rem}
+.w-success-details{background:rgba(31,214,122,.06);border:1px solid rgba(31,214,122,.15);border-radius:10px;padding:14px;margin:14px 0;text-align:left}
+.wsd-row{display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.wsd-row:last-child{border-bottom:none}
+.wsd-label{color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem}
+.wsd-val{font-weight:700;color:var(--text)}
+.wsd-val.green{color:var(--green)}
+
+.auth-logo{text-align:center;margin-bottom:36px}
+.auth-logo-mark{width:52px;height:52px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.auth-logo-mark svg{width:24px;height:24px;fill:#000}
+.auth-logo h1{font-size:1.9rem;font-weight:800;letter-spacing:-1px}
+.auth-logo h1 span{color:var(--gold)}
+.auth-logo p{font-size:.8rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:4px}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:32px;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.auth-tabs{display:flex;gap:6px;background:rgba(255,255,255,.04);border-radius:10px;padding:5px;margin-bottom:28px}
+.auth-tab{flex:1;padding:10px;border:none;border-radius:7px;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.auth-tab.tab-active{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;letter-spacing:.5px}
+.field input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Syne',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--gold)}
+.field input::placeholder{color:var(--muted2)}
+.auth-btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;margin-top:4px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));color:#000}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,160,23,.35)}
+.auth-btn:disabled{opacity:.55;cursor:not-allowed;transform:none !important;box-shadow:none !important}
+.auth-err{color:var(--red);font-size:.8rem;margin-top:10px;text-align:center;min-height:20px;font-family:'Space Mono',monospace}
+
+#dashboard-page{display:none;position:relative;z-index:1;min-height:100vh}
+.auth-wrap{width:100%;max-width:440px}
+.d-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(5,6,8,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.d-logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;font-weight:800;letter-spacing:-.5px}
+.d-logo-hex{width:32px;height:32px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center}
+.d-logo-hex svg{width:14px;height:14px;fill:#000}
+.d-logo span{color:var(--gold)}
+.d-nav-right{display:flex;align-items:center;gap:12px}
+.d-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#000}
+.d-logout{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--muted);font-family:'Syne',sans-serif;font-size:.78rem;padding:8px 14px;border-radius:8px;cursor:pointer;transition:all .2s}
+.d-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* TABS */
+.d-tabs{display:flex;gap:4px;padding:20px 40px 0;border-bottom:1px solid var(--border)}
+.dash-tab{padding:12px 20px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.dash-tab.dt-active{color:var(--gold);border-bottom-color:var(--gold)}
+.d-content{padding:36px 40px;max-width:1200px}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:36px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.sc-label{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:8px}
+.sc-val{font-size:1.7rem;font-weight:800;color:var(--gold-l)}
+.sc-val.green{color:var(--green)}
+.sc-val.white{color:var(--text)}
+.sc-sub{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* PLANS */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.plan-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l));opacity:0;transition:opacity .2s}
+.plan-card:hover{transform:translateY(-4px);border-color:rgba(212,160,23,.5);box-shadow:0 20px 48px rgba(212,160,23,.1)}
+.plan-card:hover::after,.plan-card.popular::after{opacity:1}
+.plan-card.popular{border-color:rgba(212,160,23,.4);background:linear-gradient(135deg,rgba(212,160,23,.06),var(--card))}
+.pop-badge{position:absolute;top:14px;right:14px;background:var(--gold);color:#000;font-size:.6rem;font-weight:700;border-radius:4px;padding:2px 8px}
+.pc-deposit{font-size:1.75rem;font-weight:800;color:var(--gold-l);margin-bottom:4px}
+.pc-target{font-size:.9rem;color:var(--text);margin-bottom:4px}
+.pc-target strong{color:var(--green)}
+.pc-days{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:14px}
+.pc-gain{display:flex;justify-content:space-between;align-items:center;background:rgba(31,214,122,.08);border:1px solid rgba(31,214,122,.15);border-radius:8px;padding:8px 12px;margin-bottom:12px}
+.pc-gain span{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted)}
+.pc-gain strong{font-size:.88rem;color:var(--green);font-weight:700}
+.plan-invest-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:700;font-size:.85rem;font-family:'Syne',sans-serif;border:none;border-radius:9px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.plan-invest-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,160,23,.3)}
+
+/* INVESTMENT CARDS */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.section-head h2{font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
+.section-head h2 span{color:var(--gold)}
+.sim-btn{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.25);color:var(--blue);font-family:'Space Mono',monospace;font-size:.7rem;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .2s}
+.sim-btn:hover{background:rgba(74,158,255,.2)}
+.empty-state{text-align:center;padding:60px 20px;background:var(--card);border:1px dashed var(--border);border-radius:var(--r)}
+.empty-icon{font-size:2.5rem;margin-bottom:14px}
+.empty-state h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.empty-state p{font-size:.85rem;color:var(--muted)}
+.inv-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px}
+.inv-card.inv-done{border-color:rgba(31,214,122,.3);background:rgba(31,214,122,.03)}
+.inv-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px}
+.inv-plan{font-size:1.1rem;font-weight:800}
+.inv-meta{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:3px}
+.inv-status{font-size:.65rem;font-weight:700;letter-spacing:.8px;padding:4px 10px;border-radius:4px;white-space:nowrap}
+.status-active{background:rgba(212,160,23,.12);color:var(--gold);border:1px solid rgba(212,160,23,.25)}
+.status-done{background:rgba(31,214,122,.12);color:var(--green);border:1px solid rgba(31,214,122,.25)}
+.inv-amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.ia-label{display:block;font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:4px}
+.ia-val{font-size:.95rem;font-weight:700}
+.ia-val.accent{color:var(--gold-l)}
+.ia-val.green{color:var(--green)}
+.inv-progress-wrap{margin-bottom:16px}
+.inv-progress-labels{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:7px}
+.pct-label{color:var(--gold);font-weight:700;font-family:'Space Mono',monospace}
+.inv-progress-bar{height:9px;background:rgba(255,255,255,.06);border-radius:50px;overflow:hidden}
+.inv-progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l));transition:width 1.2s cubic-bezier(.25,.1,.25,1);position:relative;overflow:hidden}
+.inv-progress-fill.fill-done{background:linear-gradient(90deg,#0a9e44,var(--green))}
+.fill-shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shine 2.5s infinite}
+@keyframes shine{0%{left:-100%}100%{left:200%}}
+.inv-progress-sub{display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-top:6px;font-family:'Space Mono',monospace}
+.withdraw-btn{width:100%;padding:13px;background:linear-gradient(135deg,#0a7a30,var(--green));color:#fff;font-weight:700;font-size:.92rem;font-family:'Syne',sans-serif;border:none;border-radius:10px;cursor:pointer;animation:wPulse 2s ease-in-out infinite}
+@keyframes wPulse{0%,100%{box-shadow:0 0 0 0 rgba(31,214,122,.4)}50%{box-shadow:0 0 0 8px rgba(31,214,122,0)}}
+.withdraw-btn:hover{transform:translateY(-2px)}
+.gr-rate{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace}
+.gr-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.gr-countdown{color:var(--gold);font-weight:700}
+
+/* ACCOUNT */
+.account-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px;max-width:480px}
+.account-card h3{font-size:1.1rem;font-weight:800;margin-bottom:20px}
+.acc-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border2)}
+.acc-row:last-child{border-bottom:none}
+.arl{font-size:.78rem;color:var(--muted);font-family:'Space Mono',monospace}
+.arr{font-size:.88rem;font-weight:600}
+.ref-box{background:rgba(212,160,23,.07);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:20px;text-align:center}
+.ref-box p{font-size:.72rem;color:var(--muted);margin-bottom:8px;font-family:'Space Mono',monospace}
+.ref-code{font-size:1.1rem;font-weight:800;color:var(--gold-l);letter-spacing:2px}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);width:100%;max-width:420px;max-height:90vh;overflow-y:auto;animation:mIn .25s ease}
+@keyframes mIn{from{transform:scale(.93) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 0}
+.modal-hdr h3{font-size:1.2rem;font-weight:800}
+.modal-close-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--muted);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close-btn:hover{background:rgba(240,78,78,.15);border-color:var(--red);color:var(--red)}
+.modal-body{padding:24px}
+.modal-step{display:none}
+.plan-info-box{background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.18);border-radius:12px;padding:16px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pib-l{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:3px}
+.pib-v{font-size:1rem;font-weight:700}
+.pib-v.g{color:var(--green)}
+.pib-v.a{color:var(--gold-l)}
+.mpesa-brand{text-align:center;margin-bottom:18px}
+.mb-name{font-size:1.4rem;font-weight:800;color:#4CAF50}
+.mb-name span{color:#FF5722}
+.mpesa-brand p{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace}
+.m-field{margin-bottom:14px}
+.m-field label{display:block;font-size:.7rem;color:var(--muted);margin-bottom:5px;font-family:'Space Mono',monospace}
+.m-field input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:9px;padding:12px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s}
+.m-field input:focus{border-color:var(--gold)}
+.mpesa-send-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1a7a30,#2ecc58);color:#fff;font-weight:700;font-size:.95rem;font-family:'Syne',sans-serif;border:none;border-radius:11px;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.mpesa-send-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(46,204,88,.3)}
+.modal-note{text-align:center;font-size:.68rem;color:var(--muted);margin-top:10px;font-family:'Space Mono',monospace;line-height:1.6}
+.processing-state{text-align:center;padding:30px 0}
+.spin{width:52px;height:52px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 18px}
+.spin.green-spin{border-top-color:var(--green)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.processing-state h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+.processing-state p{font-size:.82rem;color:var(--muted);line-height:1.6}
+.confirm-box{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:16px;text-align:center}
+.confirm-box p{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+.confirm-box strong{color:var(--green);font-size:1rem}
+.success-state{text-align:center;padding:20px 0}
+.success-icon{font-size:3rem;margin-bottom:14px;animation:popIn .4s ease}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.success-state h4{font-size:1.2rem;font-weight:800;margin-bottom:8px;color:var(--green)}
+.success-state p{font-size:.82rem;color:var(--muted);line-height:1.6}
+.w-amount-big{font-size:1.8rem;font-weight:800;color:var(--green);text-align:center;margin:16px 0}
+.withdraw-send-btn{width:100%;padding:13px;background:linear-gradient(135deg,#0a7a30,var(--green));color:#fff;font-weight:700;font-size:.95rem;font-family:'Syne',sans-serif;border:none;border-radius:11px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.withdraw-send-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(31,214,122,.3)}
+
+/* ── REFERRAL TAB ── */
+.ref-hero{background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+.ref-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,160,23,.15) 0%,transparent 70%);pointer-events:none}
+.ref-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.ref-hero-title{font-size:1.4rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.ref-hero-title span{color:var(--gold)}
+.ref-hero-sub{font-size:.82rem;color:var(--muted);line-height:1.6;max-width:380px}
+.ref-reward-pill{background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:1rem;padding:10px 20px;border-radius:50px;white-space:nowrap;box-shadow:0 6px 20px rgba(212,160,23,.3);animation:rewardPulse 2.5s ease-in-out infinite}
+@keyframes rewardPulse{0%,100%{box-shadow:0 6px 20px rgba(212,160,23,.3)}50%{box-shadow:0 8px 28px rgba(212,160,23,.55)}}
+.ref-code-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ref-code-box{flex:1;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--gold-l);letter-spacing:2px;min-width:160px}
+.ref-copy-btn{background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.3);color:var(--gold);font-family:'Space Mono',monospace;font-size:.75rem;padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ref-copy-btn:hover{background:rgba(212,160,23,.3)}
+.ref-share-btn{background:linear-gradient(135deg,#1a7a30,var(--green));color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;white-space:nowrap}
+.ref-share-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(31,214,122,.3)}
+
+/* PROGRESS SECTION */
+.ref-progress-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:24px}
+.ref-progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ref-progress-header h3{font-size:1rem;font-weight:800}
+.ref-count-badge{background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.2);color:var(--gold-l);font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px}
+.ref-progress-sub{font-size:.75rem;color:var(--muted);margin-bottom:18px}
+.ref-progress-sub strong{color:var(--green)}
+
+/* MILESTONE TRACK */
+.milestone-track{position:relative;margin-bottom:20px}
+.milestone-bar-bg{height:12px;background:rgba(255,255,255,.05);border-radius:50px;overflow:hidden;margin-bottom:16px;position:relative}
+.milestone-bar-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l));transition:width 1.2s cubic-bezier(.25,.1,.25,1);position:relative;overflow:hidden}
+.milestone-bar-fill::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:mShine 2s infinite}
+@keyframes mShine{0%{left:-100%}100%{left:200%}}
+.milestone-dots{display:flex;justify-content:space-between;position:relative}
+.milestone-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.m-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.1);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;font-family:'Space Mono',monospace;transition:all .3s;position:relative;z-index:1}
+.m-dot.achieved{background:linear-gradient(135deg,var(--gold-d),var(--gold-l));border-color:var(--gold);color:#000;box-shadow:0 0 12px rgba(212,160,23,.5)}
+.m-dot.current{border-color:var(--gold);color:var(--gold);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.4)}50%{box-shadow:0 0 0 6px rgba(212,160,23,0)}}
+.m-dot-lbl{font-size:.62rem;color:var(--muted);font-family:'Space Mono',monospace;text-align:center}
+.m-dot-lbl.achieved{color:var(--gold)}
+
+/* EARNINGS BOX */
+.ref-earnings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.ref-earn-box{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:12px;padding:14px;text-align:center}
+.ref-earn-box .re-val{font-size:1.2rem;font-weight:800;color:var(--gold-l);display:block;margin-bottom:2px}
+.ref-earn-box .re-val.green{color:var(--green)}
+.ref-earn-box .re-lbl{font-size:.62rem;color:var(--muted);font-family:'Space Mono',monospace}
+
+/* UNLOCK BANNER */
+.unlock-banner{background:rgba(31,214,122,.06);border:1px solid rgba(31,214,122,.2);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px}
+.unlock-banner.locked{background:rgba(212,160,23,.05);border-color:rgba(212,160,23,.15)}
+.unlock-icon{font-size:1.6rem;flex-shrink:0}
+.unlock-text h4{font-size:.9rem;font-weight:700;margin-bottom:2px}
+.unlock-text p{font-size:.75rem;color:var(--muted)}
+.unlock-withdraw-btn{margin-left:auto;background:linear-gradient(135deg,#0a7a30,var(--green));color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:10px 16px;border-radius:9px;border:none;cursor:pointer;white-space:nowrap;animation:wPulse 2s ease-in-out infinite;flex-shrink:0}
+
+/* REFERRALS LIST */
+.ref-list-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px}
+.ref-list-card h3{font-size:1rem;font-weight:800;margin-bottom:16px}
+.ref-list-empty{text-align:center;padding:32px;color:var(--muted);font-size:.85rem}
+.ref-list-empty .rei{font-size:2rem;margin-bottom:10px}
+.ref-friend-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2)}
+.ref-friend-row:last-child{border-bottom:none}
+.ref-friend-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold-d));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0}
+.ref-friend-info{flex:1}
+.ref-friend-name{font-size:.88rem;font-weight:700}
+.ref-friend-meta{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px}
+.ref-friend-status{font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:4px;white-space:nowrap}
+.rfs-invested{background:rgba(31,214,122,.12);color:var(--green);border:1px solid rgba(31,214,122,.2)}
+.rfs-pending{background:rgba(212,160,23,.1);color:var(--gold);border:1px solid rgba(212,160,23,.2)}
+.ref-friend-reward{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--gold-l);font-weight:700;white-space:nowrap}
+
+/* HOW IT WORKS */
+.ref-how{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.ref-how-step{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);padding:18px;text-align:center}
+.rhs-num{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:rgba(212,160,23,.25);margin-bottom:8px}
+.rhs-icon{font-size:1.4rem;margin-bottom:8px}
+.rhs-title{font-size:.85rem;font-weight:700;margin-bottom:4px}
+.rhs-desc{font-size:.72rem;color:var(--muted);line-height:1.5}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:.82rem;max-width:320px;transform:translateX(120%);transition:transform .35s cubic-bezier(.25,.1,.25,1);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(0)}
+.toast.success{border-color:rgba(31,214,122,.35);color:var(--green)}
+.toast.error{border-color:rgba(240,78,78,.35);color:var(--red)}
+.toast.info{color:var(--text)}
+
+/* ── NSE TICKER ── */
+.nse-ticker-wrap{width:100%;background:rgba(0,0,0,.55);border:1px solid rgba(212,160,23,.18);border-radius:10px;overflow:hidden;margin-bottom:22px;position:relative}
+.nse-ticker-label{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.65rem;font-family:'Space Mono',monospace;padding:0 12px;display:flex;align-items:center;z-index:2;letter-spacing:.5px;white-space:nowrap}
+.nse-ticker-label::after{content:'';position:absolute;right:-12px;top:0;bottom:0;width:13px;background:linear-gradient(90deg,var(--gold),transparent);pointer-events:none}
+.nse-ticker-track{display:flex;align-items:center;gap:0;padding:0 0 0 90px;height:38px;overflow:hidden;position:relative}
+.nse-ticker-inner{display:flex;gap:28px;animation:tickerScroll 38s linear infinite;white-space:nowrap;align-items:center}
+.nse-ticker-inner:hover{animation-play-state:paused}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.nse-tick-item{display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:.7rem;flex-shrink:0}
+.nse-tick-sym{color:var(--gold-l);font-weight:700;font-size:.68rem}
+.nse-tick-price{color:var(--text);font-weight:600}
+.nse-tick-chg.up{color:var(--green)}
+.nse-tick-chg.dn{color:var(--red)}
+.nse-tick-sep{color:var(--muted2);font-size:.55rem}
+.nse-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite;flex-shrink:0}
+.nse-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 2px}
+.nse-header-title{font-size:.62rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px}
+.nse-header-live{display:flex;align-items:center;gap:5px;font-size:.6rem;color:var(--green);font-family:'Space Mono',monospace}
+
+/* ── MPESA CONFIRM INPUT ── */
+.mpesa-confirm-input{width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(76,175,80,.35);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Space Mono',monospace;font-size:1rem;letter-spacing:2px;outline:none;transition:border-color .2s;text-transform:uppercase}
+.mpesa-confirm-input:focus{border-color:#4CAF50}
+.mpesa-confirm-input::placeholder{letter-spacing:1px;font-size:.78rem;color:var(--muted2);text-transform:none}
+.mpesa-confirm-hint{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.7;margin-top:6px}
+.mpesa-confirm-hint strong{color:var(--gold)}
+.verify-confirm-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1a5c28,#2ecc58);color:#fff;font-weight:700;font-size:.9rem;font-family:'Syne',sans-serif;border:none;border-radius:11px;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px}
+.verify-confirm-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(46,204,88,.3)}
+.verify-confirm-btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
+.confirm-code-box{background:rgba(76,175,80,.06);border:1px solid rgba(76,175,80,.2);border-radius:10px;padding:14px;margin-bottom:16px}
+.confirm-code-box p{font-size:.75rem;color:var(--muted);margin-bottom:4px;font-family:'Space Mono',monospace}
+.confirm-code-box .code-display{font-size:1.1rem;font-weight:800;color:var(--green);font-family:'Space Mono',monospace;letter-spacing:3px}
+.step-instruction{font-size:.8rem;color:var(--muted);line-height:1.7;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--gold)}
+
+/* ── FIREBASE STATUS ── */
+.fb-status{display:flex;align-items:center;gap:5px;font-size:.6rem;font-family:'Space Mono',monospace;padding:3px 8px;border-radius:4px;position:fixed;bottom:12px;left:12px;z-index:999;opacity:.7}
+.fb-status.ok{color:var(--green);background:rgba(31,214,122,.08);border:1px solid rgba(31,214,122,.15)}
+.fb-status.err{color:var(--red);background:rgba(240,78,78,.08);border:1px solid rgba(240,78,78,.15)}
+.fb-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite}
+
+/* ── FOREX TICKER ROW ── */
+.forex-ticker-wrap{width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(74,158,255,.15);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.forex-ticker-track{display:flex;align-items:center;height:34px;padding:0 12px;gap:0;overflow:hidden}
+.forex-ticker-inner{display:flex;gap:24px;animation:tickerScroll 28s linear infinite;white-space:nowrap;align-items:center}
+.forex-ticker-inner:hover{animation-play-state:paused}
+.forex-item{display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:.68rem;flex-shrink:0}
+.forex-pair{color:var(--blue);font-weight:700;font-size:.66rem}
+.forex-rate{color:var(--text);font-weight:600}
+.forex-chg.up{color:var(--green)}
+.forex-chg.dn{color:var(--red)}
+.forex-sep{color:var(--muted2);font-size:.5rem}
+.forex-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;padding:0 2px}
+.forex-header-title{font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px}
+.forex-header-time{font-size:.6rem;color:var(--muted2);font-family:'Space Mono',monospace}
+
+/* ── LIVE WITHDRAWAL FEED ── */
+.live-feed-wrap{margin-bottom:14px}
+.live-feed-label{display:flex;align-items:center;gap:6px;font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px}
+.live-feed-label .lf-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1s infinite}
+.feed-scroll{display:flex;flex-direction:column;gap:5px;max-height:100px;overflow:hidden;position:relative}
+.feed-scroll::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,var(--black));pointer-events:none}
+.feed-item{display:flex;align-items:center;gap:8px;background:rgba(31,214,122,.05);border:1px solid rgba(31,214,122,.12);border-radius:7px;padding:6px 10px;animation:feedIn .5s ease;font-size:.72rem}
+@keyframes feedIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.feed-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;color:#fff;flex-shrink:0}
+.feed-text{flex:1;color:var(--text)}
+.feed-text strong{color:var(--green)}
+.feed-time{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted2);flex-shrink:0}
+
+/* ── TESTIMONIALS ── */
+.testimonials-wrap{margin-bottom:14px}
+.testimonials-scroll{display:flex;gap:10px;overflow:hidden;position:relative;height:88px}
+.testimonials-scroll::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,var(--black));pointer-events:none}
+.testi-inner{display:flex;gap:10px;animation:testiScroll 40s linear infinite;align-items:flex-start}
+.testi-inner:hover{animation-play-state:paused}
+@keyframes testiScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.testi-card{flex-shrink:0;width:220px;background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.15);border-radius:10px;padding:10px 12px}
+.testi-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.testi-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff;flex-shrink:0}
+.testi-name{font-size:.75rem;font-weight:700;color:var(--text)}
+.testi-loc{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace}
+.testi-stars{color:var(--gold);font-size:.65rem;margin-bottom:4px}
+.testi-text{font-size:.68rem;color:var(--muted);line-height:1.5;font-style:italic}
+.testi-amount{font-size:.7rem;font-weight:800;color:var(--green);margin-top:4px;font-family:'Space Mono',monospace}
+
+/* ── REFERRAL LEADERBOARD ── */
+.leaderboard-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:24px}
+.lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.lb-header h3{font-size:1rem;font-weight:800}
+.lb-header h3 span{color:var(--gold)}
+.lb-badge{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);color:var(--gold);font-family:'Space Mono',monospace;font-size:.65rem;padding:3px 10px;border-radius:20px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border2);transition:background .15s}
+.lb-row:last-child{border-bottom:none}
+.lb-row.lb-you{background:rgba(212,160,23,.04);border-radius:8px;padding:10px 8px;margin:0 -8px;border-bottom:none}
+.lb-rank{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;width:28px;text-align:center;flex-shrink:0}
+.lb-rank.r1{color:#FFD700}
+.lb-rank.r2{color:#C0C0C0}
+.lb-rank.r3{color:#CD7F32}
+.lb-rank.rn{color:var(--muted)}
+.lb-medal{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.lb-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#fff;flex-shrink:0}
+.lb-info{flex:1}
+.lb-name{font-size:.85rem;font-weight:700}
+.lb-name-sub{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.lb-refs{font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:var(--gold-l);flex-shrink:0}
+.lb-earned{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--green);flex-shrink:0;text-align:right}
+.lb-you-tag{font-size:.6rem;background:rgba(212,160,23,.15);color:var(--gold);border:1px solid rgba(212,160,23,.3);border-radius:4px;padding:1px 6px;font-family:'Space Mono',monospace}
+.lb-empty{text-align:center;padding:28px;color:var(--muted);font-size:.82rem}
+.lb-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:8px;padding:4px;margin-bottom:16px}
+.lb-tab{flex:1;padding:7px;border:none;border-radius:6px;background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .2s}
+.lb-tab.lb-tab-active{background:var(--card2);color:var(--text)}
+
+@media(max-width:640px){
+  .d-nav{padding:14px 20px}
+  .d-tabs{padding:16px 20px 0;overflow-x:auto;gap:0}
+  .d-content{padding:20px 16px}
+  .inv-amounts{grid-template-columns:repeat(2,1fr)}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ══ TERMS & CONDITIONS MODAL ═══════════════════════════════════ */
+.tnc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+.tnc-overlay.open{display:flex}
+.tnc-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.tnc-hdr{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tnc-hdr h2{font-size:1.1rem;font-weight:800}
+.tnc-hdr h2 span{color:var(--gold)}
+.tnc-close{background:transparent;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.tnc-close:hover{border-color:var(--red);color:var(--red)}
+.tnc-meta{padding:14px 28px;background:rgba(212,160,23,.04);border-bottom:1px solid var(--border);font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;display:flex;gap:20px;flex-wrap:wrap;flex-shrink:0}
+.tnc-body{padding:24px 28px;overflow-y:auto;flex:1;line-height:1.75}
+.tnc-body h3{font-size:.88rem;font-weight:800;color:var(--gold-l);margin:22px 0 8px;font-family:'Space Mono',monospace;letter-spacing:.3px;text-transform:uppercase}
+.tnc-body h3:first-child{margin-top:0}
+.tnc-body p{font-size:.82rem;color:var(--muted);margin-bottom:10px}
+.tnc-body ul{padding-left:18px;margin-bottom:10px}
+.tnc-body ul li{font-size:.82rem;color:var(--muted);margin-bottom:5px}
+.tnc-body strong{color:var(--text)}
+.tnc-body .tnc-warn{background:rgba(240,78,78,.07);border:1px solid rgba(240,78,78,.2);border-radius:8px;padding:12px 14px;font-size:.8rem;color:#f08080;margin:14px 0}
+.tnc-body .tnc-info{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.18);border-radius:8px;padding:12px 14px;font-size:.8rem;color:var(--gold-l);margin:14px 0}
+.tnc-footer{padding:18px 28px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;flex-wrap:wrap}
+.tnc-footer-note{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace}
+.tnc-accept-btn{background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.85rem;padding:11px 28px;border:none;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif}
+.tnc-accept-btn:hover{opacity:.9}
+.tnc-link{background:none;border:none;color:var(--gold);font-size:.72rem;font-family:'Space Mono',monospace;cursor:pointer;text-decoration:underline;padding:0}
+.tnc-link:hover{color:var(--gold-l)}
+.auth-tnc-row{text-align:center;margin-top:10px;font-size:.7rem;color:var(--muted)}
+.acc-tnc-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Space Mono',monospace;font-size:.72rem;cursor:pointer;margin-top:10px;transition:border-color .2s,color .2s;text-align:left;display:flex;align-items:center;gap:10px}
+.acc-tnc-btn:hover{border-color:var(--gold);color:var(--gold)}
+.acc-tnc-btn .tnc-icon{font-size:1rem}
+
+/* ══ PORTFOLIO CHARTS ════════════════════════════════════════════ */
+.chart-section{margin-bottom:24px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.chart-header h3{font-size:.95rem;font-weight:800}
+.chart-header h3 span{color:var(--gold)}
+.chart-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:8px;padding:3px}
+.chart-tab{padding:5px 12px;border:none;border-radius:6px;background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chart-tab.ct-active{background:var(--card2);color:var(--text)}
+.growth-chart-wrap{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:20px 20px 14px;margin-bottom:16px;position:relative;overflow:hidden}
+.growth-chart-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l),transparent)}
+.chart-canvas-wrap{position:relative;height:220px}
+.chart-canvas-wrap canvas{width:100%!important}
+.inv-chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-top:14px}
+.inv-chart-card .icc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.inv-chart-card .icc-title{font-size:.8rem;font-weight:700;color:var(--muted)}
+.inv-chart-card .icc-val{font-family:'Space Mono',monospace;font-size:.9rem;color:var(--green);font-weight:700}
+.inv-chart-card canvas{width:100%!important;height:110px!important}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.cl-item{display:flex;align-items:center;gap:6px;font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.cl-dot{width:8px;height:8px;border-radius:50%}
+.ohlc-bar{display:flex;gap:16px;background:rgba(255,255,255,.025);border-radius:8px;padding:10px 14px;margin-bottom:14px;overflow-x:auto}
+.ohlc-item{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.ohlc-label{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.3px}
+.ohlc-val{font-size:.82rem;font-weight:700;font-family:'Space Mono',monospace}
+.ohlc-val.up{color:var(--green)}
+.ohlc-val.dn{color:var(--red)}
+.ohlc-val.gold{color:var(--gold-l)}
+.ohlc-sep{width:1px;background:var(--border2);flex-shrink:0;align-self:stretch}
+.port-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:580px){.port-charts-row{grid-template-columns:1fr}}
+.port-chart-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.pcc-title{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.4px}
+.pcc-canvas-wrap{position:relative;height:160px;display:flex;align-items:center;justify-content:center}
+.pcc-canvas-wrap canvas{max-height:160px}
+</style>
+</head>
+<body>
+
+<!-- FIREBASE STATUS BADGE -->
+<div class="fb-status" id="fb-status-badge"><div class="fb-dot"></div><span id="fb-status-txt">Connecting…</span></div>
+
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <div class="auth-outer">
+
+    <!-- ══ LEFT HERO (desktop only) ═══════════════════════════════ -->
+    <div class="auth-hero">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        LIVE · <span id="hero-investor-count">2,847</span> ACTIVE INVESTORS
+      </div>
+      <h1 class="hero-headline">
+        Your Money <span class="hl-gold">Grows Every</span>
+        <span class="hl-line2">Single Day.</span>
+      </h1>
+      <p class="hero-sub">Razor Chart turns your M-PESA savings into daily returns. Join thousands of Kenyans already building wealth — one plan at a time.</p>
+
+      <!-- KEY STATS -->
+      <div class="hero-stats">
+        <div class="hs-card">
+          <div class="hs-val green" id="stat-paid">Ksh 4.8M+</div>
+          <div class="hs-label">TOTAL PAID OUT TO INVESTORS</div>
+        </div>
+        <div class="hs-card">
+          <div class="hs-val blue" id="stat-investors">2,847</div>
+          <div class="hs-label">ACTIVE INVESTORS RIGHT NOW</div>
+        </div>
+        <div class="hs-card">
+          <div class="hs-val">28%</div>
+          <div class="hs-label">DAILY RETURN · EVERY PLAN</div>
+        </div>
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div class="hero-testi-label">✦ WHAT OUR INVESTORS SAY</div>
+      <div class="hero-testis">
+        <div class="hero-testi">
+          <div class="ht-avatar" style="background:linear-gradient(135deg,#1a5c28,#2ecc58)">JK</div>
+          <div class="ht-body">
+            <div class="ht-name">James Kamau</div>
+            <div class="ht-loc">📍 Nairobi · Kikuyu</div>
+            <div class="ht-quote">"Deposited Monday, payout landed Friday. Razor Chart is the real deal — M-PESA confirmed every step."</div>
+            <span class="ht-amount">✓ Withdrew Ksh 25,000</span>
+          </div>
+        </div>
+        <div class="hero-testi">
+          <div class="ht-avatar" style="background:linear-gradient(135deg,#1a3a6b,#4A9EFF)">AA</div>
+          <div class="ht-body">
+            <div class="ht-name">Adhiambo Auma</div>
+            <div class="ht-loc">📍 Kisumu · Luo</div>
+            <div class="ht-quote">"My balance grows every day — I can see it in the dashboard. Referred 3 friends, we all profit together!"</div>
+            <span class="ht-amount">✓ Withdrew Ksh 50,000</span>
+          </div>
+        </div>
+        <div class="hero-testi">
+          <div class="ht-avatar" style="background:linear-gradient(135deg,#5c1a1a,#e05a2b)">CK</div>
+          <div class="ht-body">
+            <div class="ht-name">Chebet Koech</div>
+            <div class="ht-loc">📍 Eldoret · Kalenjin</div>
+            <div class="ht-quote">"The NSE ticker and forex rates make it feel like a proper financial platform. Very trustworthy."</div>
+            <span class="ht-amount">✓ Withdrew Ksh 15,000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRUST BADGES -->
+      <div class="hero-trust">
+        <div class="trust-badge"><span>🔒</span><span>256-BIT ENCRYPTED</span></div>
+        <div class="trust-divider"></div>
+        <div class="trust-badge"><span>📱</span><span>M-PESA VERIFIED</span></div>
+        <div class="trust-divider"></div>
+        <div class="trust-badge"><span>🇰🇪</span><span>KENYA-BASED</span></div>
+        <div class="trust-divider"></div>
+        <div class="trust-badge"><span>⚡</span><span>INSTANT PAYOUTS</span></div>
+      </div>
+    </div>
+
+    <!-- ══ RIGHT: TICKERS + AUTH CARD ════════════════════════════ -->
+    <div class="auth-right">
+
+      <!-- NSE TICKER ROW -->
+      <div style="margin-bottom:4px">
+        <div class="nse-header">
+          <span class="nse-header-title">🇰🇪 NAIROBI SECURITIES EXCHANGE</span>
+          <span class="nse-header-live"><span class="nse-live-dot"></span>LIVE MARKET</span>
+        </div>
+        <div class="nse-ticker-wrap">
+          <div class="nse-ticker-label">NSE 20</div>
+          <div class="nse-ticker-track">
+            <div class="nse-ticker-inner" id="nse-ticker-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOREX TICKER ROW -->
+      <div style="margin-bottom:14px">
+        <div class="forex-header">
+          <span class="forex-header-title">💱 FOREX RATES · KES</span>
+          <span class="forex-header-time" id="forex-time">—</span>
+        </div>
+        <div class="forex-ticker-wrap">
+          <div class="forex-ticker-track">
+            <div class="forex-ticker-inner" id="forex-ticker-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE WITHDRAWALS FEED -->
+      <div class="live-feed-wrap">
+        <div class="live-feed-label"><span class="lf-dot"></span>LIVE WITHDRAWALS · VERIFIED M-PESA PAYOUTS</div>
+        <div class="feed-scroll" id="live-feed-scroll"></div>
+      </div>
+
+      <!-- TESTIMONIALS SCROLL (mobile only) -->
+      <div class="testimonials-wrap">
+        <div class="testimonials-scroll">
+          <div class="testi-inner" id="testi-inner"></div>
+        </div>
+      </div>
+
+      <div class="auth-logo">
+        <div class="auth-logo-mark"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+        <h1><span>Razor</span>Chart</h1>
+        <p>FINANCIAL GROUP · EST. 2024</p>
+      </div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab tab-active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+        </div>
+        <div id="login-form">
+          <div class="field"><label>EMAIL ADDRESS</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+          <div class="field"><label>PASSWORD</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
+          <button class="auth-btn" id="btn-login" onclick="doLogin()">Sign In →</button>
+          <div class="auth-err" id="login-err"></div>
+        </div>
+        <div id="register-form" style="display:none">
+          <div class="field"><label>FULL NAME</label><input type="text" id="reg-name" placeholder="e.g. John Kamau"/></div>
+          <div class="field"><label>M-PESA PHONE</label><input type="tel" id="reg-phone" placeholder="0712 345 678"/></div>
+          <div class="field"><label>EMAIL ADDRESS</label><input type="email" id="reg-email" placeholder="you@example.com"/></div>
+          <div class="field"><label>PASSWORD (min 6 chars)</label><input type="password" id="reg-pass" placeholder="••••••••"/></div>
+          <div class="field"><label>REFERRAL CODE (optional)</label><input type="text" id="reg-ref" placeholder="e.g. RC-AB12CD" style="text-transform:uppercase"/></div>
+          <button class="auth-btn" id="btn-register" onclick="doRegister()">Create Account →</button>
+          <div class="auth-err" id="register-err"></div>
+          <div class="auth-tnc-row">By registering you agree to our <button class="tnc-link" onclick="openTNC()">Terms &amp; Conditions</button></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashboard-page">
+  <nav class="d-nav">
+    <div class="d-logo">
+      <div class="d-logo-hex"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+      <span>Razor</span>Chart
+    </div>
+    <div class="d-nav-right">
+      <div class="d-avatar" id="dash-initials">RC</div>
+      <button class="d-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="d-tabs">
+    <button class="dash-tab dt-active" onclick="switchDashTab('portfolio')">📊 Portfolio</button>
+    <button class="dash-tab" onclick="switchDashTab('invest')">💰 Invest</button>
+    <button class="dash-tab" onclick="switchDashTab('referrals')">🤝 Referrals</button>
+    <button class="dash-tab" onclick="switchDashTab('account')">👤 Account</button>
+  </div>
+
+  <div class="d-content">
+    <!-- PORTFOLIO -->
+    <div id="tab-portfolio">
+      <div class="summary-grid">
+        <div class="sum-card"><div class="sc-label">TOTAL BALANCE</div><div class="sc-val" id="sum-balance">Ksh 0</div><div class="sc-sub">All investments</div></div>
+        <div class="sum-card"><div class="sc-label">TOTAL PROFIT</div><div class="sc-val green" id="sum-profit">Ksh 0</div><div class="sc-sub">28% daily growth</div></div>
+        <div class="sum-card"><div class="sc-label">ACTIVE PLANS</div><div class="sc-val white" id="sum-active">0</div><div class="sc-sub">Currently growing</div></div>
+        <div class="sum-card"><div class="sc-label">COMPLETED</div><div class="sc-val white" id="sum-done">0</div><div class="sc-sub">Ready to withdraw</div></div>
+      </div>
+
+      <!-- CHARTS SECTION -->
+      <div class="chart-section" id="portfolio-charts" style="display:none">
+        <div class="chart-header">
+          <h3>Portfolio <span>Charts</span></h3>
+          <div class="chart-tabs">
+            <button class="chart-tab ct-active" onclick="switchChartView('growth')">📈 Growth</button>
+            <button class="chart-tab" onclick="switchChartView('allocation')">🥧 Allocation</button>
+            <button class="chart-tab" onclick="switchChartView('daily')">📊 Daily P&L</button>
+          </div>
+        </div>
+
+        <!-- OHLC TICKER BAR -->
+        <div class="ohlc-bar" id="ohlc-bar">
+          <div class="ohlc-item"><div class="ohlc-label">OPEN</div><div class="ohlc-val gold" id="ohlc-open">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">HIGH</div><div class="ohlc-val up" id="ohlc-high">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">LOW</div><div class="ohlc-val dn" id="ohlc-low">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">CURRENT</div><div class="ohlc-val up" id="ohlc-close">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">PROFIT</div><div class="ohlc-val up" id="ohlc-profit">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">ROI</div><div class="ohlc-val up" id="ohlc-roi">—</div></div>
+          <div class="ohlc-sep"></div>
+          <div class="ohlc-item"><div class="ohlc-label">CHANGE</div><div class="ohlc-val up" id="ohlc-change">—</div></div>
+        </div>
+
+        <!-- CHART VIEWS -->
+        <div id="chart-growth">
+          <div class="growth-chart-wrap">
+            <div class="chart-canvas-wrap"><canvas id="growthChart"></canvas></div>
+            <div class="chart-legend">
+              <div class="cl-item"><div class="cl-dot" style="background:var(--green)"></div>PORTFOLIO BALANCE</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--gold)"></div>DEPOSIT BASE</div>
+              <div class="cl-item"><div class="cl-dot" style="background:rgba(74,158,255,.6)"></div>TARGET</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chart-allocation" style="display:none">
+          <div class="port-charts-row">
+            <div class="port-chart-card">
+              <div class="pcc-title">PLAN ALLOCATION</div>
+              <div class="pcc-canvas-wrap"><canvas id="allocChart"></canvas></div>
+            </div>
+            <div class="port-chart-card">
+              <div class="pcc-title">PROFIT vs DEPOSIT</div>
+              <div class="pcc-canvas-wrap"><canvas id="profitSplitChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chart-daily" style="display:none">
+          <div class="growth-chart-wrap">
+            <div class="chart-canvas-wrap"><canvas id="dailyChart"></canvas></div>
+            <div class="chart-legend">
+              <div class="cl-item"><div class="cl-dot" style="background:var(--green)"></div>DAILY PROFIT (KSH)</div>
+              <div class="cl-item"><div class="cl-dot" style="background:rgba(240,78,78,.6)"></div>DAYS AT LOSS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>My <span>Investments</span></h2>
+        <button class="sim-btn" onclick="simulateGrowth()">⚡ Simulate Daily Growth</button>
+      </div>
+      <div id="inv-list"></div>
+    </div>
+
+    <!-- INVEST -->
+    <div id="tab-invest" style="display:none">
+      <div class="section-head"><h2>Choose a <span>Plan</span></h2></div>
+      <div class="plans-grid" id="plans-grid"></div>
+    </div>
+
+    <!-- REFERRALS -->
+    <div id="tab-referrals" style="display:none">
+
+      <!-- HOW IT WORKS -->
+      <div class="ref-how">
+        <div class="ref-how-step"><div class="rhs-num">01</div><div class="rhs-icon">🔗</div><div class="rhs-title">Share Your Code</div><div class="rhs-desc">Copy your unique referral link and share with friends via WhatsApp, SMS or social media.</div></div>
+        <div class="ref-how-step"><div class="rhs-num">02</div><div class="rhs-icon">👤</div><div class="rhs-title">Friend Registers</div><div class="rhs-desc">Your friend creates an account using your referral code during sign-up.</div></div>
+        <div class="ref-how-step"><div class="rhs-num">03</div><div class="rhs-icon">💰</div><div class="rhs-title">Friend Invests</div><div class="rhs-desc">Once they make any deposit on any plan, you earn Ksh 100 as a referral bonus.</div></div>
+        <div class="ref-how-step"><div class="rhs-num">04</div><div class="rhs-icon">🎯</div><div class="rhs-title">Reach 5 Friends</div><div class="rhs-desc">After 5 friends invest, your Ksh 500 total bonus unlocks for M-PESA withdrawal.</div></div>
+      </div>
+
+      <!-- HERO / CODE SHARE -->
+      <div class="ref-hero">
+        <div class="ref-hero-top">
+          <div>
+            <div class="ref-hero-title">Earn <span>Ksh 100</span> Per Referral</div>
+            <div class="ref-hero-sub">Invite friends to Razor Chart. Every friend who invests earns you Ksh 100. Refer 5 investing friends and withdraw Ksh 500 instantly to M-PESA.</div>
+          </div>
+          <div class="ref-reward-pill">+Ksh 100 / friend</div>
+        </div>
+        <div class="ref-code-row">
+          <div class="ref-code-box" id="ref-link-display">RC-XXXXXX</div>
+          <button class="ref-copy-btn" onclick="copyRefCode()">📋 Copy Code</button>
+          <button class="ref-share-btn" onclick="shareRefCode()">📲 Share via WhatsApp</button>
+        </div>
+      </div>
+
+      <!-- PROGRESS CARD -->
+      <div class="ref-progress-card">
+        <div class="ref-progress-header">
+          <h3>Your Referral Progress</h3>
+          <div class="ref-count-badge"><span id="ref-count-num">0</span> / 5 friends</div>
+        </div>
+        <div class="ref-progress-sub">
+          Refer <strong id="ref-remaining">5 more</strong> friends who invest to unlock your Ksh 500 withdrawal
+        </div>
+
+        <!-- MILESTONE BAR -->
+        <div class="milestone-track">
+          <div class="milestone-bar-bg">
+            <div class="milestone-bar-fill" id="ref-bar-fill" style="width:0%"></div>
+          </div>
+          <div class="milestone-dots" id="milestone-dots">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+
+        <!-- EARNINGS -->
+        <div class="ref-earnings-row">
+          <div class="ref-earn-box"><span class="re-val" id="ref-total-earned">Ksh 0</span><span class="re-lbl">TOTAL EARNED</span></div>
+          <div class="ref-earn-box"><span class="re-val green" id="ref-withdrawable">Ksh 0</span><span class="re-lbl">WITHDRAWABLE</span></div>
+          <div class="ref-earn-box"><span class="re-val" id="ref-pending-earn">Ksh 0</span><span class="re-lbl">PENDING (locked)</span></div>
+        </div>
+
+        <!-- UNLOCK BANNER -->
+        <div class="unlock-banner locked" id="unlock-banner">
+          <div class="unlock-icon">🔒</div>
+          <div class="unlock-text">
+            <h4 id="unlock-title">Ksh 500 Bonus Locked</h4>
+            <p id="unlock-desc">Refer 5 friends who invest to unlock withdrawal</p>
+          </div>
+          <button class="unlock-withdraw-btn" id="unlock-btn" style="display:none" onclick="openRefWithdraw()">
+            Withdraw Ksh 500 →
+          </button>
+        </div>
+      </div>
+
+      <!-- REFERRED FRIENDS LIST -->
+      <div class="ref-list-card">
+        <h3>Referred Friends</h3>
+        <div id="ref-friends-list">
+          <div class="ref-list-empty"><div class="rei">👥</div>No referrals yet. Share your code to get started!</div>
+        </div>
+      </div>
+
+      <!-- REFERRAL LEADERBOARD -->
+      <div class="leaderboard-card">
+        <div class="lb-header">
+          <h3>🏆 Top <span>Referrers</span> This Month</h3>
+          <span class="lb-badge" id="lb-updated">LIVE</span>
+        </div>
+        <div class="lb-tabs">
+          <button class="lb-tab lb-tab-active" onclick="switchLbTab('referrals')">By Referrals</button>
+          <button class="lb-tab" onclick="switchLbTab('earnings')">By Earnings</button>
+        </div>
+        <div id="leaderboard-list">
+          <div class="lb-empty">Loading leaderboard…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACCOUNT -->
+    <div id="tab-account" style="display:none">
+      <div class="account-card">
+        <h3>Account Details</h3>
+        <div class="acc-row"><span class="arl">NAME</span><span class="arr" id="acc-name">—</span></div>
+        <div class="acc-row"><span class="arl">EMAIL</span><span class="arr" id="acc-email">—</span></div>
+        <div class="acc-row"><span class="arl">M-PESA</span><span class="arr" id="acc-phone">—</span></div>
+        <div class="acc-row"><span class="arl">DAILY RETURN</span><span class="arr" style="color:var(--green)">28% / day</span></div>
+        <div class="acc-row"><span class="arl">PLATFORM</span><span class="arr" style="color:var(--gold)">Razor Chart Financial Group</span></div>
+        <div class="ref-box"><p>YOUR REFERRAL CODE</p><div class="ref-code" id="ref-code">RC-XXXXXX</div></div>
+        <button class="acc-tnc-btn" onclick="openTNC()"><span class="tnc-icon">📄</span>Terms &amp; Conditions · Privacy Policy · User Agreement</button>
+        <button class="acc-tnc-btn" onclick="doLogout()" style="margin-top:6px;border-color:rgba(240,78,78,.3);color:#f08080"><span class="tnc-icon">🚪</span>Sign Out of Razor Chart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TERMS & CONDITIONS MODAL -->
+<div class="tnc-overlay" id="tnc-modal">
+  <div class="tnc-box">
+    <div class="tnc-hdr">
+      <h2>📄 <span>Razor Chart</span> — Terms &amp; Conditions</h2>
+      <button class="tnc-close" onclick="closeTNC()">✕</button>
+    </div>
+    <div class="tnc-meta">
+      <span>📅 Effective Date: 1 January 2025</span>
+      <span>🏢 Razor Chart Financial Group</span>
+      <span>🇰🇪 Nairobi, Kenya</span>
+      <span>📧 support@razorchart.co.ke</span>
+    </div>
+    <div class="tnc-body">
+
+      <div class="tnc-warn">⚠ <strong>Important:</strong> Please read these terms carefully before using the Razor Chart platform. By registering or making any deposit, you confirm that you have read, understood, and agreed to these terms in full.</div>
+
+      <h3>1. About Razor Chart</h3>
+      <p>Razor Chart Financial Group ("Razor Chart", "we", "us", "our") is a digital investment platform operating in the Republic of Kenya. We provide users ("Investor", "you", "your") with access to structured investment plans with defined return targets, delivered through M-PESA mobile money services provided by Safaricom PLC.</p>
+      <p>Razor Chart is not a bank, microfinance institution, or licensed capital markets intermediary under the Capital Markets Act (Cap. 485A) of Kenya. Investments made on this platform are subject to the specific terms of each plan selected.</p>
+
+      <h3>2. Eligibility</h3>
+      <ul>
+        <li>You must be at least <strong>18 years of age</strong> to register and use this platform.</li>
+        <li>You must be a resident of Kenya and hold a valid Safaricom M-PESA account.</li>
+        <li>You must not be acting on behalf of another person without written authorisation.</li>
+        <li>You must not be subject to any legal prohibition that would prevent you from entering into a financial agreement.</li>
+        <li>By registering, you confirm all information provided is accurate, complete, and your own.</li>
+      </ul>
+
+      <h3>3. Investment Plans</h3>
+      <p>Razor Chart offers structured investment plans with the following general characteristics:</p>
+      <ul>
+        <li>Minimum deposit: <strong>Ksh 500</strong></li>
+        <li>Daily return rate: <strong>28% per day</strong> on the deposited principal</li>
+        <li>Plan duration: fixed number of days per plan selected</li>
+        <li>Returns are credited to your portfolio balance daily during the plan term</li>
+        <li>Upon reaching the target balance, the full amount becomes available for M-PESA withdrawal</li>
+      </ul>
+      <div class="tnc-info">💡 <strong>Example:</strong> A Ksh 1,000 deposit on a 7-day plan at 28% daily would have a target balance of approximately Ksh 6,275. Returns accumulate daily.</div>
+      <p>Plan terms, deposit amounts, and return rates are subject to change. Any changes will be communicated via the platform before they take effect and will not apply retroactively to active investments.</p>
+
+      <h3>4. Deposits &amp; Payments</h3>
+      <ul>
+        <li>All deposits must be made exclusively via <strong>Safaricom M-PESA</strong> using the in-app STK Push mechanism.</li>
+        <li>A deposit is only considered valid upon submission of a genuine <strong>M-PESA confirmation code</strong> (e.g. QGH1X2ABC3) received via SMS after a successful payment.</li>
+        <li>Each M-PESA confirmation code may only be used once. Attempts to reuse a code will be rejected.</li>
+        <li>Razor Chart is not responsible for failed payments caused by incorrect PIN entry, insufficient M-PESA balance, or Safaricom network issues.</li>
+        <li>Do not share your M-PESA PIN with anyone, including Razor Chart staff.</li>
+      </ul>
+
+      <h3>5. Withdrawals</h3>
+      <ul>
+        <li>Withdrawals are only available once an investment plan reaches its <strong>target balance</strong>.</li>
+        <li>All withdrawals are processed to your registered M-PESA number.</li>
+        <li>A withdrawal requires verification via a valid M-PESA transaction code to prevent fraud.</li>
+        <li>Processing time is typically within 24 hours of a valid withdrawal request, subject to Safaricom B2C service availability.</li>
+        <li>Razor Chart reserves the right to delay or withhold withdrawals pending identity verification or fraud investigation.</li>
+        <li>Minimum withdrawal amount is the full target balance of a completed plan.</li>
+      </ul>
+      <div class="tnc-warn">⚠ <strong>Early withdrawal:</strong> Withdrawals before a plan reaches its target are not permitted under standard terms. Contact support for exceptional circumstances.</div>
+
+      <h3>6. Referral Programme</h3>
+      <ul>
+        <li>You may refer new users to Razor Chart using your unique referral code.</li>
+        <li>A referral bonus of <strong>Ksh 100</strong> is credited per referred user who makes a qualifying investment.</li>
+        <li>A total bonus of <strong>Ksh 500</strong> becomes withdrawable once <strong>5 referred users</strong> have each made a qualifying investment.</li>
+        <li>Referral bonuses may not be used as investment deposits — they are only withdrawable to M-PESA.</li>
+        <li>Self-referral (using your own code), creating multiple accounts, or any manipulation of the referral system is strictly prohibited and will result in account termination and forfeiture of all balances.</li>
+        <li>Razor Chart reserves the right to modify referral bonus amounts and eligibility criteria at any time.</li>
+      </ul>
+
+      <h3>7. Risk Disclosure</h3>
+      <div class="tnc-warn">⚠ <strong>High-Risk Investment Warning:</strong> The returns offered by Razor Chart (28% daily) are significantly above standard market rates and carry substantial risk. Past performance of any plan does not guarantee future results. You may lose some or all of your deposited funds. Only invest amounts you can afford to lose entirely. Do not invest borrowed money, emergency funds, or money designated for essential expenses.</div>
+      <p>By making a deposit, you acknowledge that:</p>
+      <ul>
+        <li>You understand the high-risk nature of this investment product</li>
+        <li>You are making an independent financial decision</li>
+        <li>You have not been coerced, misled, or promised guaranteed returns verbally</li>
+        <li>Razor Chart's liability is limited to the terms stated in these conditions</li>
+      </ul>
+
+      <h3>8. Prohibited Conduct</h3>
+      <p>The following actions are strictly prohibited and will result in immediate account suspension and forfeiture of funds:</p>
+      <ul>
+        <li>Creating multiple accounts for any purpose</li>
+        <li>Using fraudulent, stolen, or borrowed M-PESA accounts</li>
+        <li>Submitting false M-PESA confirmation codes</li>
+        <li>Attempting to manipulate platform balances or referral counts</li>
+        <li>Using automated scripts, bots, or technical exploits</li>
+        <li>Engaging in money laundering, terrorist financing, or any illegal activity through the platform</li>
+        <li>Sharing account credentials with any third party</li>
+      </ul>
+
+      <h3>9. Privacy &amp; Data Protection</h3>
+      <p>Razor Chart collects and processes the following personal data: full name, email address, M-PESA phone number, transaction history, and device/usage data. This data is used exclusively to operate the platform, process payments, detect fraud, and communicate with you.</p>
+      <ul>
+        <li>Your data is stored securely using Firebase (Google Cloud) infrastructure with 256-bit encryption.</li>
+        <li>We do not sell, rent, or share your personal data with third parties for marketing purposes.</li>
+        <li>Transaction data may be shared with Safaricom solely for the purpose of processing M-PESA payments.</li>
+        <li>We comply with the <strong>Kenya Data Protection Act, 2019</strong> and its regulations.</li>
+        <li>You may request deletion of your account data by contacting support@razorchart.co.ke.</li>
+      </ul>
+
+      <h3>10. Account Termination</h3>
+      <p>Razor Chart reserves the right to suspend or terminate any account at its sole discretion if there is reasonable belief of fraud, breach of these terms, or any conduct detrimental to the platform or its users. In such cases:</p>
+      <ul>
+        <li>Active investments may be frozen pending investigation</li>
+        <li>Where fraud is confirmed, balances may be forfeited</li>
+        <li>Legal action may be pursued under Kenyan law</li>
+      </ul>
+      <p>You may close your account at any time by contacting support, provided there are no active investments or pending withdrawals.</p>
+
+      <h3>11. Limitation of Liability</h3>
+      <p>To the maximum extent permitted by Kenyan law, Razor Chart's total liability to you in connection with the platform shall not exceed the amount of your last confirmed deposit. We are not liable for:</p>
+      <ul>
+        <li>Loss of profits beyond agreed plan returns</li>
+        <li>Losses arising from Safaricom network downtime or M-PESA service interruptions</li>
+        <li>Unauthorised access to your account due to your failure to protect login credentials</li>
+        <li>Any indirect, consequential, or incidental losses</li>
+      </ul>
+
+      <h3>12. Dispute Resolution</h3>
+      <p>Any dispute arising from your use of Razor Chart shall first be referred to our support team at support@razorchart.co.ke for resolution within <strong>14 business days</strong>. If unresolved, disputes shall be submitted to mediation under the Nairobi Centre for International Arbitration (NCIA) rules, and if still unresolved, to the courts of Kenya, whose jurisdiction you hereby submit to.</p>
+
+      <h3>13. Governing Law</h3>
+      <p>These Terms and Conditions are governed by and construed in accordance with the laws of the <strong>Republic of Kenya</strong>, including but not limited to the Consumer Protection Act, 2012, the Kenya Information and Communications Act, and the Data Protection Act, 2019.</p>
+
+      <h3>14. Amendments</h3>
+      <p>Razor Chart may update these Terms at any time. Continued use of the platform after notice of changes constitutes acceptance of the revised terms. We will notify registered users via the platform or email of any material changes at least 7 days before they take effect.</p>
+
+      <h3>15. Contact Us</h3>
+      <p>For support, complaints, or data requests, contact us at:</p>
+      <ul>
+        <li>📧 Email: <strong>support@razorchart.co.ke</strong></li>
+        <li>📱 WhatsApp: <strong>+254 700 000 000</strong></li>
+        <li>🏢 Address: Razor Chart Financial Group, Westlands, Nairobi, Kenya</li>
+        <li>⏰ Hours: Monday–Friday, 8:00 AM – 6:00 PM EAT</li>
+      </ul>
+
+    </div>
+    <div class="tnc-footer">
+      <div class="tnc-footer-note">Last updated: 1 January 2025 · Version 1.0</div>
+      <button class="tnc-accept-btn" onclick="closeTNC()">✓ I Have Read &amp; Accept</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVEST MODAL -->
+<div class="modal-overlay" id="invest-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><h3>Activate Investment</h3><button class="modal-close-btn" onclick="closeModal('invest-modal')">✕</button></div>
+    <div class="modal-body">
+      <!-- STEP 1: Phone entry -->
+      <div class="modal-step" id="step-phone">
+        <div class="plan-info-box">
+          <div><div class="pib-l">DEPOSIT</div><div class="pib-v a" id="m-deposit">—</div></div>
+          <div><div class="pib-l">TARGET</div><div class="pib-v g" id="m-target">—</div></div>
+          <div><div class="pib-l">DURATION</div><div class="pib-v" id="m-days">—</div></div>
+          <div><div class="pib-l">TOTAL GAIN</div><div class="pib-v g" id="m-gain">—</div></div>
+        </div>
+        <div class="mpesa-brand"><div class="mb-name">M-<span>PESA</span></div><p>Secure Mobile Payment · STK Push</p></div>
+        <div class="m-field"><label>SAFARICOM NUMBER</label><input type="tel" id="m-phone" placeholder="0712 345 678"/></div>
+        <button class="mpesa-send-btn" onclick="sendSTK()">📱 Send M-PESA Request</button>
+        <div class="modal-note">An STK push will appear on your phone.<br>Enter your PIN to confirm payment.</div>
+      </div>
+      <!-- STEP 2: Waiting for user to pay -->
+      <div class="modal-step" id="step-processing">
+        <div class="processing-state"><div class="spin"></div><h4>STK Push Sent…</h4><p>Check your phone for the M-PESA prompt.<br>Enter your PIN to complete payment.<br><br><span style="color:var(--gold);font-family:'Space Mono',monospace;font-size:.75rem">After paying, an SMS confirmation code<br>will be sent to your number.</span></p>
+        <button class="mpesa-send-btn" onclick="showStep('step-confirm-code')" style="margin-top:20px;background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:var(--green)">✅ I've Paid — Enter Confirmation Code</button>
+        </div>
+      </div>
+      <!-- STEP 3: Enter M-PESA confirmation code -->
+      <div class="modal-step" id="step-confirm-code">
+        <div class="mpesa-brand"><div class="mb-name">M-<span>PESA</span></div><p>Payment Verification Required</p></div>
+        <div class="step-instruction">
+          After a successful M-PESA payment, <strong style="color:var(--gold)">Safaricom sends you an SMS</strong> with a confirmation code.<br>
+          Example: <span style="color:var(--green);font-family:'Space Mono',monospace">QGH1X2ABC3</span><br>
+          Enter that code below to verify your payment and activate your investment.
+        </div>
+        <div class="m-field">
+          <label>M-PESA CONFIRMATION CODE</label>
+          <input type="text" id="mpesa-code-input" class="mpesa-confirm-input" placeholder="e.g. QGH1X2ABC3" maxlength="12" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+          <div class="mpesa-confirm-hint">The code is 10 characters — letters and numbers only.<br>Check your M-PESA SMS inbox if you haven't received it yet.</div>
+        </div>
+        <div id="code-verify-err" style="color:var(--red);font-size:.75rem;font-family:'Space Mono',monospace;min-height:18px;margin-bottom:4px"></div>
+        <button class="verify-confirm-btn" id="btn-verify-code" onclick="verifyAndActivate()">🔐 Verify & Activate Investment</button>
+        <div class="modal-note" style="margin-top:10px">Your investment <strong>will only activate</strong> after a valid M-PESA code is confirmed.</div>
+      </div>
+      <!-- STEP 4: Verifying -->
+      <div class="modal-step" id="step-verifying">
+        <div class="processing-state"><div class="spin"></div><h4>Verifying Payment…</h4><p>Checking your M-PESA confirmation code.<br>This takes just a moment.</p></div>
+      </div>
+      <!-- STEP 5: Success -->
+      <div class="modal-step" id="step-success">
+        <div class="success-state">
+          <div class="success-icon">🚀</div>
+          <h4>Investment Activated!</h4>
+          <div class="confirm-code-box" style="margin:12px 0">
+            <p>M-PESA CODE VERIFIED</p>
+            <div class="code-display" id="verified-code-display">—</div>
+          </div>
+          <p>Your money is now growing at 28% daily.<br>Check Portfolio to track progress.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="withdraw-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><h3>💸 Withdraw to M-PESA</h3><button class="modal-close-btn" onclick="closeModal('withdraw-modal')">✕</button></div>
+    <div class="modal-body">
+
+      <!-- STEP 1: Review + Phone -->
+      <div class="modal-step" id="w-form">
+        <div class="mpesa-brand"><div class="mb-name">M-<span>PESA</span></div><p>Instant B2C Transfer · Safaricom</p></div>
+        <div class="w-breakdown" id="w-breakdown">
+          <div class="w-breakdown-row"><span class="wbr-label">PLAN DEPOSIT</span><span class="wbr-val" id="w-deposit">—</span></div>
+          <div class="w-breakdown-row"><span class="wbr-label">TOTAL PROFIT EARNED</span><span class="wbr-val green" id="w-profit">—</span></div>
+          <div class="w-breakdown-row" style="padding-top:10px;margin-top:4px;border-top:1px solid rgba(31,214,122,.2)">
+            <span class="wbr-label" style="color:var(--text);font-weight:700">TOTAL WITHDRAWAL</span>
+            <span class="wbr-val gold" style="font-size:1.1rem" id="w-amount">—</span>
+          </div>
+        </div>
+        <div class="w-status-badge">
+          <span class="w-status-icon">✅</span>
+          <span>Investment target reached — funds ready for withdrawal</span>
+        </div>
+        <div class="m-field">
+          <label>RECEIVE ON M-PESA NUMBER</label>
+          <input type="tel" id="w-phone" placeholder="0712 345 678"/>
+        </div>
+        <button class="withdraw-send-btn" onclick="initiateWithdraw()">💸 Withdraw Now →</button>
+        <div class="modal-note">You will receive an M-PESA confirmation SMS once processed.</div>
+      </div>
+
+      <!-- STEP 2: Enter M-PESA outgoing confirmation code -->
+      <div class="modal-step" id="w-confirm-code">
+        <div class="mpesa-brand"><div class="mb-name">M-<span>PESA</span></div><p>Confirm Your Identity</p></div>
+        <div class="step-instruction">
+          To release your funds, enter your M-PESA PIN via the STK Push sent to your phone, then enter the <strong style="color:var(--gold)">M-PESA transaction code</strong> from the confirmation SMS below.
+        </div>
+        <div class="w-amount-big" id="w-amount-confirm">—</div>
+        <div class="w-mpesa-code-field">
+          <label>M-PESA TRANSACTION CODE FROM SMS</label>
+          <input type="text" id="w-code-input" class="mpesa-confirm-input" placeholder="e.g. RGH7K2MNP0" maxlength="12" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+          <div class="w-code-hint">Check your Safaricom SMS for a code like <strong>RGH7K2MNP0</strong>.<br>This verifies the payment is from your account.</div>
+        </div>
+        <div id="w-code-err" style="color:var(--red);font-size:.75rem;font-family:'Space Mono',monospace;min-height:18px;margin-bottom:8px"></div>
+        <button class="withdraw-send-btn" id="btn-w-verify" onclick="confirmWithdraw()">🔐 Confirm Withdrawal</button>
+      </div>
+
+      <!-- STEP 3: Processing -->
+      <div class="modal-step" id="w-processing">
+        <div class="processing-state">
+          <div class="spin green-spin"></div>
+          <h4>Processing Withdrawal…</h4>
+          <p>Verifying your M-PESA code and sending funds.<br>This takes just a moment.</p>
+        </div>
+      </div>
+
+      <!-- STEP 4: Success + Receipt -->
+      <div class="modal-step" id="w-success">
+        <div class="success-state">
+          <div class="success-icon">🎉</div>
+          <h4>Withdrawal Successful!</h4>
+          <p>Funds are on their way to your M-PESA.</p>
+          <div class="w-success-details" id="w-receipt">
+            <div class="wsd-row"><span class="wsd-label">AMOUNT SENT</span><span class="wsd-val green" id="r-amount">—</span></div>
+            <div class="wsd-row"><span class="wsd-label">M-PESA NUMBER</span><span class="wsd-val" id="r-phone">—</span></div>
+            <div class="wsd-row"><span class="wsd-label">TRANSACTION CODE</span><span class="wsd-val" id="r-code">—</span></div>
+            <div class="wsd-row"><span class="wsd-label">DATE & TIME</span><span class="wsd-val" id="r-time">—</span></div>
+            <div class="wsd-row"><span class="wsd-label">STATUS</span><span class="wsd-val green">✓ COMPLETED</span></div>
+          </div>
+          <div class="modal-note" style="margin-top:8px">Screenshot this receipt for your records.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- REFERRAL WITHDRAW MODAL -->
+<div class="modal-overlay" id="ref-withdraw-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><h3>Withdraw Referral Bonus</h3><button class="modal-close-btn" onclick="closeModal('ref-withdraw-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-step" id="rw-form">
+        <div class="mpesa-brand"><div class="mb-name">M-<span>PESA</span></div><p>Referral Bonus Withdrawal</p></div>
+        <div class="w-amount-big">Ksh 500</div>
+        <div style="background:rgba(31,214,122,.07);border:1px solid rgba(31,214,122,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:.8rem;color:var(--muted);line-height:1.6;text-align:center">
+          🎉 You've successfully referred <strong style="color:var(--green)">5 investing friends!</strong><br>Your Ksh 500 bonus is ready to withdraw.
+        </div>
+        <div class="m-field"><label>RECEIVE ON NUMBER</label><input type="tel" id="rw-phone" placeholder="0712 345 678"/></div>
+        <button class="withdraw-send-btn" onclick="doRefWithdraw()">💸 Withdraw Ksh 500 Now</button>
+        <div class="modal-note">Funds sent to M-PESA within 60 seconds.</div>
+      </div>
+      <div class="modal-step" id="rw-processing">
+        <div class="processing-state"><div class="spin green-spin"></div><h4>Processing…</h4><p>Sending your bonus to M-PESA.</p></div>
+      </div>
+      <div class="modal-step" id="rw-success">
+        <div class="success-state"><div class="success-icon">🎉</div><h4>Bonus Withdrawn!</h4><p>Ksh 500 sent to your M-PESA.<br>Keep referring to earn more!</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════
+     SINGLE UNIFIED MODULE SCRIPT
+════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, set, get, push, onValue, update }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── FIREBASE CONFIG ─────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyCyh0lgw_B3gpYI-xsp2AqxKWvF7m3Xwms",
+  authDomain:        "razor-7a518.firebaseapp.com",
+  databaseURL:       "https://razor-7a518-default-rtdb.firebaseio.com",
+  projectId:         "razor-7a518",
+  storageBucket:     "razor-7a518.firebasestorage.app",
+  messagingSenderId: "644076556714",
+  appId:             "1:644076556714:web:b784ce4c74a0601345dbd3",
+  measurementId:     "G-SEEQTVTW6S"
+};
+// ────────────────────────────────────────────────────────────────
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getDatabase(app);
+
+// ── PLANS ───────────────────────────────────────────────────────
+const PLANS = [
+  {id:"p500",   deposit:500,    target:3500,   days:7},
+  {id:"p1000",  deposit:1000,   target:5000,   days:7},
+  {id:"p2000",  deposit:2000,   target:15000,  days:10},
+  {id:"p5000",  deposit:5000,   target:25000,  days:10},
+  {id:"p10000", deposit:10000,  target:50000,  days:12, popular:true},
+  {id:"p20000", deposit:20000,  target:80000,  days:12},
+  {id:"p50000", deposit:50000,  target:200000, days:14},
+  {id:"p100000",deposit:100000, target:400000, days:14},
+];
+
+// ── HELPERS ─────────────────────────────────────────────────────
+const fmt   = n => "Ksh " + Number(n).toLocaleString("en-KE",{minimumFractionDigits:0,maximumFractionDigits:0});
+const $     = id => document.getElementById(id);
+const val   = id => ($( id)?.value || "").trim();
+const txt   = (id,t) => { const e=$(id); if(e) e.textContent=t; };
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+function toast(msg, type="info") {
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  $("toast-container").appendChild(el);
+  setTimeout(() => el.classList.add("show"), 10);
+  setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.remove(),400); }, 4000);
+}
+
+function setErr(id, msg) { const e=$(id); if(e){ e.textContent=msg; } }
+function clearErr(id)    { setErr(id,""); }
+
+// ── PAGE SWITCHING ───────────────────────────────────────────────
+function showAuth()      { $("auth-page").style.display="flex"; $("dashboard-page").style.display="none"; }
+function showDashboard() { $("auth-page").style.display="none"; $("dashboard-page").style.display="block"; }
+
+window.switchAuthTab = tab => {
+  $("tab-login").classList.toggle("tab-active", tab==="login");
+  $("tab-register").classList.toggle("tab-active", tab==="register");
+  $("login-form").style.display    = tab==="login"    ? "block" : "none";
+  $("register-form").style.display = tab==="register" ? "block" : "none";
+  clearErr("login-err"); clearErr("register-err");
+};
+
+window.switchDashTab = tab => {
+  const tabs = ["portfolio","invest","referrals","account"];
+  document.querySelectorAll(".dash-tab").forEach((t,i) => t.classList.toggle("dt-active", tabs[i]===tab));
+  $("tab-portfolio").style.display  = tab==="portfolio"  ? "block" : "none";
+  $("tab-invest").style.display     = tab==="invest"     ? "block" : "none";
+  $("tab-referrals").style.display  = tab==="referrals"  ? "block" : "none";
+  $("tab-account").style.display    = tab==="account"    ? "block" : "none";
+};
+
+// ── MODALS ───────────────────────────────────────────────────────
+function openModal(id)   { $(id).classList.add("open"); document.body.style.overflow="hidden"; }
+window.closeModal = id => { $(id).classList.remove("open"); document.body.style.overflow=""; };
+
+function showStep(id) {
+  // hide all steps in all modals, then show the target
+  document.querySelectorAll(".modal-step").forEach(s => s.style.display="none");
+  const s = $(id); if(s) s.style.display="block";
+}
+
+document.querySelectorAll(".modal-overlay").forEach(m => {
+  m.addEventListener("click", e => { if(e.target===m) { m.classList.remove("open"); document.body.style.overflow=""; }});
+});
+
+// ── AUTH ─────────────────────────────────────────────────────────
+let currentUser = null;
+let unsubFn     = null;
+let unsubRef    = null;
+let selectedPlan   = null;
+let withdrawId     = null;
+let withdrawPhone  = null;
+let withdrawAmount = 0;
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+    showDashboard();
+    renderPlans();
+    await loadProfile(user);
+    listenInvestments(user.uid);
+    listenReferrals(user.uid);
+  } else {
+    currentUser = null;
+    if (unsubFn)  { unsubFn();  unsubFn=null;  }
+    if (unsubRef) { unsubRef(); unsubRef=null; }
+    showAuth();
+  }
+});
+
+window.doRegister = async () => {
+  clearErr("register-err");
+  const name  = val("reg-name");
+  const phone = val("reg-phone");
+  const email   = val("reg-email");
+  const pass    = val("reg-pass");
+  const refCode = val("reg-ref").toUpperCase();
+  if (!name||!phone||!email||!pass) return setErr("register-err","Please fill in all fields.");
+  if (pass.length < 6)              return setErr("register-err","Password must be at least 6 characters.");
+  const btn = $("btn-register");
+  btn.disabled=true; btn.textContent="Creating account…";
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    const newCode = "RC-" + cred.user.uid.slice(0,6).toUpperCase();
+    await set(ref(db, `users/${cred.user.uid}/profile`), {
+      name, phone, email,
+      createdAt:      Date.now(),
+      totalDeposited: 0,
+      referralCode:   newCode,
+      referredBy:     refCode || null,
+    });
+    // Store code in global index for fast lookup
+    await set(ref(db,`referralIndex/${newCode}`), cred.user.uid);
+    // If referred, create pending referral on referrer's account
+    if (refCode) {
+      const idxSnap = await get(ref(db, `referralIndex/${refCode}`));
+      if (idxSnap.exists()) {
+        const referrerUid = idxSnap.val();
+        const pendRef = push(ref(db,`users/${referrerUid}/referrals`));
+        await set(pendRef, {
+          friendUid:   cred.user.uid,
+          friendName:  name,
+          friendEmail: email,
+          joinedAt:    Date.now(),
+          status:      "pending",
+        });
+      }
+    }
+    toast("Welcome to Razor Chart! 🎉","success");
+    // onAuthStateChanged will handle the redirect automatically
+  } catch(e) {
+    const msg = e.code === "auth/email-already-in-use" ? "Email already registered. Try signing in."
+              : e.code === "auth/invalid-email"        ? "Invalid email address."
+              : e.code === "auth/weak-password"        ? "Password is too weak."
+              : e.message;
+    setErr("register-err", msg);
+    btn.disabled=false; btn.textContent="Create Account →";
+  }
+};
+
+window.doLogin = async () => {
+  clearErr("login-err");
+  const email = val("login-email");
+  const pass  = val("login-pass");
+  if (!email||!pass) return setErr("login-err","Enter your email and password.");
+  const btn = $("btn-login");
+  btn.disabled=true; btn.textContent="Signing in…";
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    toast("Welcome back!","success");
+    // onAuthStateChanged handles redirect
+  } catch(e) {
+    const msg = e.code === "auth/user-not-found"  ? "No account found with this email."
+              : e.code === "auth/wrong-password"  ? "Incorrect password."
+              : e.code === "auth/invalid-email"   ? "Invalid email address."
+              : e.code === "auth/invalid-credential" ? "Wrong email or password."
+              : e.message;
+    setErr("login-err", msg);
+    btn.disabled=false; btn.textContent="Sign In →";
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  toast("Signed out","info");
+};
+
+// ── PROFILE ──────────────────────────────────────────────────────
+async function loadProfile(user) {
+  const snap = await get(ref(db, `users/${user.uid}/profile`));
+  const d    = snap.exists() ? snap.val() : {};
+  const name = d.name || user.displayName || "Investor";
+  const code = "RC-" + user.uid.slice(0,6).toUpperCase();
+  txt("dash-initials",    name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase());
+  txt("acc-name",         name);
+  txt("acc-email",        user.email);
+  txt("acc-phone",        d.phone || "—");
+  txt("ref-code",         code);
+  txt("ref-link-display", code);
+  // Store referral code in profile if not set
+  if (!d.referralCode) {
+    await update(ref(db,`users/${user.uid}/profile`), { referralCode: code });
+  }
+}
+
+// ── INVESTMENTS (real-time) ───────────────────────────────────────
+function listenInvestments(uid) {
+  unsubFn = onValue(ref(db, `users/${uid}/investments`), snap => {
+    const list = [];
+    snap.forEach(c => list.push({id:c.key, ...c.val()}));
+    list.sort((a,b)=>(b.startDate||0)-(a.startDate||0));
+    renderInvestments(list);
+    renderSummary(list);
+  });
+}
+
+function renderSummary(list) {
+  const totalBal  = list.reduce((s,i)=>s+i.currentBalance,0);
+  const totalDep  = list.reduce((s,i)=>s+i.deposit,0);
+  const active    = list.filter(i=>i.status==="active").length;
+  const done      = list.filter(i=>i.status==="completed").length;
+  txt("sum-balance", fmt(totalBal));
+  txt("sum-profit",  fmt(Math.max(0,totalBal-totalDep)));
+  txt("sum-active",  active);
+  txt("sum-done",    done);
+}
+
+function renderInvestments(list) {
+  const el = $("inv-list");
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📈</div><h3>No Investments Yet</h3><p>Go to the Invest tab to start earning 28% daily.</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(inv => {
+    const pct     = Math.min(100,(inv.currentBalance/inv.target)*100);
+    const earned  = Math.max(0, inv.currentBalance - inv.deposit);
+    const done    = inv.status==="completed";
+    const elapsed = Math.floor((Date.now()-(inv.startDate||Date.now()))/86400000);
+    return `
+    <div class="inv-card ${done?"inv-done":""}">
+      <div class="inv-top">
+        <div><div class="inv-plan">${fmt(inv.deposit)} Plan</div><div class="inv-meta">Started ${elapsed} day${elapsed!==1?"s":""} ago · ${inv.days}-day target</div></div>
+        <div class="inv-status ${done?"status-done":"status-active"}">${done?"✓ TARGET HIT":"⚡ GROWING"}</div>
+      </div>
+      <div class="inv-amounts">
+        <div><span class="ia-label">Deposited</span><span class="ia-val">${fmt(inv.deposit)}</span></div>
+        <div><span class="ia-label">Balance</span><span class="ia-val accent">${fmt(inv.currentBalance)}</span></div>
+        <div><span class="ia-label">Target</span><span class="ia-val green">${fmt(inv.target)}</span></div>
+        <div><span class="ia-label">Profit</span><span class="ia-val green">+${fmt(earned)}</span></div>
+      </div>
+      <div class="inv-progress-wrap">
+        <div class="inv-progress-labels"><span>Progress to target</span><span class="pct-label">${pct.toFixed(1)}%</span></div>
+        <div class="inv-progress-bar"><div class="inv-progress-fill ${done?"fill-done":""}" style="width:${pct}%">${!done?'<span class="fill-shine"></span>':''}</div></div>
+        <div class="inv-progress-sub"><span>${fmt(inv.currentBalance)} of ${fmt(inv.target)}</span><span>${done?"Ready to withdraw!":"~"+Math.max(0,inv.days-elapsed)+" days left"}</span></div>
+      </div>
+      ${done
+        ? `<button class="withdraw-btn" onclick="openWithdraw('${inv.id}','${inv.target}')">💸 Withdraw ${fmt(inv.target)} to M-PESA</button>`
+        : `<div class="gr-rate"><span class="gr-dot"></span>28% daily growth · Next update in <span class="gr-countdown" data-inv="${inv.id}">calculating…</span></div>`
+      }
+    </div>`;
+  }).join("");
+  // Render charts after DOM is updated
+  setTimeout(() => renderPortfolioCharts(list), 100);
+}
+
+// ── COUNTDOWN TIMER ───────────────────────────────────────────────
+setInterval(() => {
+  const now  = new Date();
+  const next = new Date(); next.setHours(24,0,0,0);
+  const diff = next - now;
+  const h    = String(Math.floor(diff/3600000)).padStart(2,"0");
+  const m    = String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
+  const s    = String(Math.floor((diff%60000)/1000)).padStart(2,"0");
+  document.querySelectorAll(".gr-countdown").forEach(el => el.textContent=`${h}:${m}:${s}`);
+}, 1000);
+
+// ── PLANS GRID ────────────────────────────────────────────────────
+function renderPlans() {
+  const grid = $("plans-grid");
+  if (!grid || grid.children.length) return;
+  PLANS.forEach(p => {
+    const gain  = ((p.target-p.deposit)/p.deposit*100).toFixed(0);
+    const daily = fmt(Math.round(p.deposit*0.28));
+    const card  = document.createElement("div");
+    card.className = "plan-card" + (p.popular?" popular":"");
+    card.innerHTML = `
+      ${p.popular?'<div class="pop-badge">MOST POPULAR</div>':""}
+      <div class="pc-deposit">${fmt(p.deposit)}</div>
+      <div class="pc-target">Target: <strong>${fmt(p.target)}</strong></div>
+      <div class="pc-days">⏱ ${p.days}-day plan · 28% per day</div>
+      <div class="pc-gain"><span>Daily profit</span><strong>+${daily}</strong></div>
+      <div class="pc-gain"><span>Total return</span><strong>+${gain}%</strong></div>
+      <button class="plan-invest-btn" onclick="openInvest('${p.id}')">Invest ${fmt(p.deposit)} →</button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── INVEST FLOW ───────────────────────────────────────────────────
+window.openInvest = id => {
+  selectedPlan = PLANS.find(p=>p.id===id);
+  if (!selectedPlan) return;
+  const gain = ((selectedPlan.target-selectedPlan.deposit)/selectedPlan.deposit*100).toFixed(0);
+  txt("m-deposit", fmt(selectedPlan.deposit));
+  txt("m-target",  fmt(selectedPlan.target));
+  txt("m-days",    selectedPlan.days+" days");
+  txt("m-gain",    gain+"%");
+  txt("conf-amt",  fmt(selectedPlan.deposit));
+  $("m-phone").value = "";
+  showStep("step-phone");
+  openModal("invest-modal");
+};
+
+window.sendSTK = async () => {
+  const phone = val("m-phone");
+  if (!phone || phone.length < 9) return toast("Enter a valid Safaricom number","error");
+  showStep("step-processing");
+  // In production: call your Cloud Function here to trigger Daraja STK Push
+  // e.g. await fetch('/api/stk-push', { method:'POST', body: JSON.stringify({ phone, amount: selectedPlan.deposit }) })
+  toast("STK Push sent to "+phone+" 📱","info");
+};
+
+// ── VERIFY M-PESA CODE & ACTIVATE ────────────────────────────────
+window.verifyAndActivate = async () => {
+  const code = ($("mpesa-code-input")?.value || "").trim().toUpperCase();
+  const errEl = $("code-verify-err");
+  errEl.textContent = "";
+
+  // Validate format: M-PESA codes are 10 alphanumeric chars
+  if (!code || code.length < 8) {
+    errEl.textContent = "⚠ Code too short. M-PESA codes are 10 characters.";
+    return;
+  }
+  if (!/^[A-Z0-9]{8,12}$/.test(code)) {
+    errEl.textContent = "⚠ Invalid format. Use letters and numbers only.";
+    return;
+  }
+
+  // Check this code hasn't been used before (prevent double-use)
+  const codeSnap = await get(ref(db, `usedMpesaCodes/${code}`));
+  if (codeSnap.exists()) {
+    errEl.textContent = "⚠ This M-PESA code has already been used.";
+    return;
+  }
+
+  const btn = $("btn-verify-code");
+  btn.disabled = true;
+  showStep("step-verifying");
+
+  try {
+    if (!selectedPlan || !currentUser) throw new Error("Session expired. Please try again.");
+    const uid = currentUser.uid;
+
+    // Lock the code immediately to prevent race conditions
+    await set(ref(db, `usedMpesaCodes/${code}`), {
+      usedBy:    uid,
+      usedAt:    Date.now(),
+      planId:    selectedPlan.id,
+      amount:    selectedPlan.deposit,
+      phone:     val("m-phone"),
+    });
+
+    // Create the investment
+    const newRef = push(ref(db, `users/${uid}/investments`));
+    await set(newRef, {
+      planId:         selectedPlan.id,
+      deposit:        selectedPlan.deposit,
+      target:         selectedPlan.target,
+      days:           selectedPlan.days,
+      currentBalance: selectedPlan.deposit,
+      status:         "active",
+      startDate:      Date.now(),
+      lastUpdated:    Date.now(),
+      phone:          val("m-phone"),
+      mpesaCode:      code,          // store proof of payment
+    });
+
+    // Update profile totalDeposited
+    const profSnap = await get(ref(db, `users/${uid}/profile`));
+    const profData = profSnap.exists() ? profSnap.val() : {};
+    await update(ref(db, `users/${uid}/profile`), {
+      totalDeposited: (profData.totalDeposited || 0) + selectedPlan.deposit
+    });
+
+    // Show verified code in success screen
+    txt("verified-code-display", code);
+    showStep("step-success");
+    toast("Investment activated! Growing at 28% daily 🚀","success");
+
+    // ── Credit referrer if this is user's first investment ──
+    const profSnap2 = await get(ref(db, `users/${uid}/profile`));
+    const prof2     = profSnap2.exists() ? profSnap2.val() : {};
+    const invSnap   = await get(ref(db, `users/${uid}/investments`));
+    const invCount  = invSnap.exists() ? Object.keys(invSnap.val()).length : 0;
+    if (invCount === 1 && prof2.referredBy) {
+      const idxSnap = await get(ref(db, `referralIndex/${prof2.referredBy}`));
+      if (idxSnap.exists()) {
+        const referrerUid = idxSnap.val();
+        const refSnap = await get(ref(db, `users/${referrerUid}/referrals`));
+        if (refSnap.exists()) {
+          refSnap.forEach(child => {
+            if (child.val().friendUid === uid && child.val().status === "pending") {
+              update(ref(db, `users/${referrerUid}/referrals/${child.key}`), {
+                status: "invested", investedAt: Date.now()
+              });
+            }
+          });
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────
+
+    setTimeout(() => { closeModal("invest-modal"); switchDashTab("portfolio"); }, 3000);
+  } catch(e) {
+    toast("Error: " + e.message, "error");
+    // Release the code lock if activation failed after locking
+    try { await set(ref(db, `usedMpesaCodes/${code}`), null); } catch(_){}
+    showStep("step-confirm-code");
+    if(btn) btn.disabled = false;
+  }
+};
+
+// ── WITHDRAW FLOW ─────────────────────────────────────────────────
+window.openWithdraw = async (id, amount) => {
+  withdrawId     = id;
+  withdrawAmount = parseFloat(amount);
+  // Pre-fill phone
+  const snap = await get(ref(db,`users/${currentUser.uid}/profile`));
+  const prof = snap.exists() ? snap.val() : {};
+  $("w-phone").value = prof.phone || "";
+  // Populate breakdown
+  const invSnap = await get(ref(db,`users/${currentUser.uid}/investments/${id}`));
+  const inv = invSnap.exists() ? invSnap.val() : {};
+  const deposit = inv.deposit || 0;
+  const profit  = (inv.currentBalance||amount) - deposit;
+  txt("w-deposit", fmt(deposit));
+  txt("w-profit",  "+" + fmt(Math.max(0, profit)));
+  txt("w-amount",  fmt(amount));
+  txt("w-amount-confirm", fmt(amount));
+  $("w-code-input") && ($("w-code-input").value = "");
+  $("w-code-err")   && ($("w-code-err").textContent = "");
+  showStep("w-form");
+  openModal("withdraw-modal");
+};
+
+window.initiateWithdraw = async () => {
+  const phone = val("w-phone");
+  if (!phone || phone.length < 9) return toast("Enter your M-PESA number","error");
+  withdrawPhone = phone;
+  // Send STK Push (in production: call Daraja B2C API here)
+  toast("M-PESA prompt sent to " + phone + " 📱","info");
+  showStep("w-confirm-code");
+};
+
+window.confirmWithdraw = async () => {
+  const code = ($("w-code-input")?.value || "").trim().toUpperCase();
+  const errEl = $("w-code-err");
+  errEl.textContent = "";
+  if (!code || code.length < 8) { errEl.textContent = "⚠ Code too short. M-PESA codes are 10 characters."; return; }
+  if (!/^[A-Z0-9]{8,12}$/.test(code)) { errEl.textContent = "⚠ Invalid format — letters and numbers only."; return; }
+  // Check code not already used
+  const usedSnap = await get(ref(db, `usedMpesaCodes/${code}`));
+  if (usedSnap.exists()) { errEl.textContent = "⚠ This M-PESA code has already been used."; return; }
+  const btn = $("btn-w-verify");
+  if(btn) btn.disabled = true;
+  showStep("w-processing");
+  try {
+    const uid = currentUser.uid;
+    const now = Date.now();
+    // Lock code
+    await set(ref(db, `usedMpesaCodes/${code}`), { usedBy:uid, usedAt:now, type:"withdrawal", amount:withdrawAmount, phone:withdrawPhone });
+    // Mark investment withdrawn
+    await update(ref(db, `users/${uid}/investments/${withdrawId}`), { status:"withdrawn", withdrawnAt:now, withdrawCode:code, withdrawPhone:withdrawPhone });
+    // Populate receipt
+    txt("r-amount", fmt(withdrawAmount));
+    txt("r-phone",  withdrawPhone);
+    txt("r-code",   code);
+    txt("r-time",   new Date(now).toLocaleString("en-KE",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}));
+    showStep("w-success");
+    toast("Ksh " + withdrawAmount.toLocaleString() + " sent to M-PESA! 🎉","success");
+    setTimeout(()=>closeModal("withdraw-modal"), 6000);
+  } catch(e) {
+    toast("Error: " + e.message, "error");
+    try { await set(ref(db, `usedMpesaCodes/${code}`), null); } catch(_){}
+    showStep("w-confirm-code");
+    if(btn) btn.disabled = false;
+  }
+};
+
+// ── SIMULATE DAILY GROWTH (demo) ─────────────────────────────────
+window.simulateGrowth = async () => {
+  if (!currentUser) return;
+  const snap = await get(ref(db,`users/${currentUser.uid}/investments`));
+  if (!snap.exists()) return toast("No investments found","info");
+  const updates = {};
+  let count = 0;
+  snap.forEach(c => {
+    const inv = c.val();
+    if (inv.status!=="active") return;
+    const newBal    = Math.min(inv.target, inv.currentBalance*1.28);
+    const newStatus = newBal>=inv.target ? "completed" : "active";
+    updates[`${c.key}/currentBalance`] = newBal;
+    updates[`${c.key}/status`]         = newStatus;
+    updates[`${c.key}/lastUpdated`]    = Date.now();
+    count++;
+  });
+  if (!count) return toast("No active investments to update","info");
+  await update(ref(db,`users/${currentUser.uid}/investments`), updates);
+  toast(`✅ 28% growth applied to ${count} investment(s)`,"success");
+};
+// ── REFERRAL SYSTEM ──────────────────────────────────────────────
+const REWARD_PER_FRIEND  = 100;
+const FRIENDS_TO_UNLOCK  = 5;
+const TOTAL_BONUS        = REWARD_PER_FRIEND * FRIENDS_TO_UNLOCK; // 500
+
+function listenReferrals(uid) {
+  unsubRef = onValue(ref(db,`users/${uid}/referrals`), snap => {
+    const list = [];
+    snap.forEach(c => list.push({id:c.key, ...c.val()}));
+    list.sort((a,b)=>(b.joinedAt||0)-(a.joinedAt||0));
+    renderReferrals(list);
+    // Update leaderboard entry for this user
+    const invested = list.filter(r=>r.status==="invested");
+    get(ref(db,`users/${uid}/profile`)).then(s=>{
+      const d = s.exists() ? s.val() : {};
+      if(d.name) updateLeaderboardEntry(uid, d.name, "Kenya", invested.length, invested.length*100);
+    }).catch(()=>{});
+  });
+}
+
+function renderReferrals(list) {
+  const invested = list.filter(r=>r.status==="invested");
+  const pending  = list.filter(r=>r.status==="pending");
+  const count    = invested.length;
+  const pct      = Math.min(100,(count/FRIENDS_TO_UNLOCK)*100);
+  const earned   = count * REWARD_PER_FRIEND;
+  const unlocked = count >= FRIENDS_TO_UNLOCK;
+  const remaining= Math.max(0, FRIENDS_TO_UNLOCK - count);
+
+  // Progress bar
+  const bar = $("ref-bar-fill");
+  if (bar) bar.style.width = pct+"%";
+
+  // Count badge & sub
+  txt("ref-count-num",   count);
+  txt("ref-remaining",   remaining > 0 ? remaining+" more" : "0 more — UNLOCKED!");
+
+  // Earnings
+  txt("ref-total-earned",  "Ksh "+earned.toLocaleString());
+  txt("ref-withdrawable",  unlocked ? "Ksh "+TOTAL_BONUS.toLocaleString() : "Ksh 0");
+  txt("ref-pending-earn",  !unlocked ? "Ksh "+earned.toLocaleString() : "Ksh 0");
+
+  // Milestone dots
+  const dotsEl = $("milestone-dots");
+  if (dotsEl) {
+    dotsEl.innerHTML = Array.from({length:FRIENDS_TO_UNLOCK},(_,i)=>{
+      const done = i < count;
+      const curr = i === count;
+      return `
+        <div class="milestone-dot-wrap">
+          <div class="m-dot ${done?"achieved":curr?"current":""}">
+            ${done ? "✓" : i+1}
+          </div>
+          <div class="m-dot-lbl ${done?"achieved":""}">
+            ${done ? "+Ksh 100" : "Friend "+(i+1)}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  // Unlock banner
+  const banner = $("unlock-banner");
+  const btn    = $("unlock-btn");
+  const title  = $("unlock-title");
+  const desc   = $("unlock-desc");
+  if (banner && btn && title && desc) {
+    if (unlocked) {
+      banner.className = "unlock-banner";
+      banner.querySelector(".unlock-icon").textContent = "🎉";
+      title.textContent = "Ksh 500 Bonus Unlocked!";
+      desc.textContent  = "You've referred 5 investing friends. Withdraw now!";
+      btn.style.display = "block";
+    } else {
+      banner.className = "unlock-banner locked";
+      banner.querySelector(".unlock-icon").textContent = "🔒";
+      title.textContent = `Ksh ${earned.toLocaleString()} Earned · ${remaining} more to unlock`;
+      desc.textContent  = `Refer ${remaining} more friend${remaining!==1?"s":""} who invest to withdraw Ksh 500`;
+      btn.style.display = "none";
+    }
+  }
+
+  // Friends list
+  const listEl = $("ref-friends-list");
+  if (!listEl) return;
+  if (!list.length) {
+    listEl.innerHTML = `<div class="ref-list-empty"><div class="rei">👥</div>No referrals yet. Share your code to get started!</div>`;
+    return;
+  }
+  listEl.innerHTML = list.map((r,i) => {
+    const initials = (r.friendName||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const date     = new Date(r.joinedAt||Date.now()).toLocaleDateString("en-KE",{day:"numeric",month:"short",year:"numeric"});
+    const invested = r.status==="invested";
+    return `
+    <div class="ref-friend-row">
+      <div class="ref-friend-avatar" style="background:hsl(${(i*67)%360},45%,35%)">${initials}</div>
+      <div class="ref-friend-info">
+        <div class="ref-friend-name">${r.friendName||"Anonymous"}</div>
+        <div class="ref-friend-meta">Joined ${date}</div>
+      </div>
+      <span class="ref-friend-status ${invested?"rfs-invested":"rfs-pending"}">${invested?"✓ Invested":"⏳ Pending"}</span>
+      <div class="ref-friend-reward">${invested?"+Ksh 100":"—"}</div>
+    </div>`;
+  }).join("");
+}
+
+window.copyRefCode = () => {
+  const code = $("ref-link-display")?.textContent || "";
+  navigator.clipboard.writeText(code).then(()=>toast("Referral code copied! 📋","success")).catch(()=>{
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = code; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+    toast("Referral code copied! 📋","success");
+  });
+};
+
+window.shareRefCode = () => {
+  const code = $("ref-link-display")?.textContent || "";
+  const msg  = encodeURIComponent(
+    `🚀 Join me on Razor Chart and grow your money at 28% daily!\n\nUse my referral code: *${code}*\n\nDeposit from Ksh 500 and watch it grow. Payouts via M-PESA!\n\n👉 Sign up now and enter my code when registering.`
+  );
+  window.open(`https://wa.me/?text=${msg}`,"_blank");
+};
+
+window.openRefWithdraw = async () => {
+  const snap = await get(ref(db,`users/${currentUser.uid}/profile`));
+  $("rw-phone").value = snap.exists() ? (snap.val().phone||"") : "";
+  showStep("rw-form");
+  openModal("ref-withdraw-modal");
+};
+
+window.doRefWithdraw = async () => {
+  const phone = val("rw-phone");
+  if (!phone||phone.length<9) return toast("Enter your M-PESA number","error");
+  // Prevent double-withdrawal
+  const profSnap = await get(ref(db,`users/${currentUser.uid}/profile`));
+  const profData = profSnap.exists() ? profSnap.val() : {};
+  if (profData.referralBonusWithdrawn) {
+    return toast("Referral bonus already withdrawn.","error");
+  }
+  showStep("rw-processing");
+  await sleep(3000);
+  await update(ref(db,`users/${currentUser.uid}/profile`),{
+    referralBonusWithdrawn: true,
+    referralWithdrawnAt:    Date.now(),
+    referralWithdrawPhone:  phone,
+  });
+  showStep("rw-success");
+  toast("Ksh 500 referral bonus sent to M-PESA! 🎉","success");
+  setTimeout(()=>closeModal("ref-withdraw-modal"),3000);
+};
+
+
+// ══════════════════════════════════════════════════════════════
+// HERO STATS — animated counters + live investor count drift
+// ══════════════════════════════════════════════════════════════
+(function(){
+  let totalPaid     = 4820000;   // Ksh
+  let activeInvest  = 2847;
+  function fmtM(n){ return n>=1000000 ? "Ksh "+(n/1000000).toFixed(1)+"M+" : "Ksh "+(n/1000).toFixed(0)+"K+"; }
+  function updateHeroStats(){
+    // Drift totals slightly upward every 12s
+    totalPaid    += Math.floor(Math.random()*3000+500);
+    activeInvest += Math.floor(Math.random()*3)-1;
+    activeInvest  = Math.max(2800, activeInvest);
+    const sp = document.getElementById("stat-paid");       if(sp) sp.textContent = fmtM(totalPaid);
+    const si = document.getElementById("stat-investors");  if(si) si.textContent = activeInvest.toLocaleString();
+    const hc = document.getElementById("hero-investor-count"); if(hc) hc.textContent = activeInvest.toLocaleString();
+  }
+  updateHeroStats();
+  setInterval(updateHeroStats, 12000);
+})();
+
+
+// ══════════════════════════════════════════════════════════════
+const NSE_STOCKS = [
+  ["SCOM","Safaricom",  24.80,0.45],["EQTY","Equity Grp",48.50,0.80],
+  ["KCB", "KCB Group",  38.20,0.60],["COOP","Co-op Bank", 14.90,0.30],
+  ["ABSA","ABSA Bank",  12.40,0.25],["DTB", "DTB Group",  72.00,1.20],
+  ["BAMB","Bamburi",    38.00,0.70],["EABL","EABL",      170.00,2.50],
+  ["KQ",  "Kenya Air",   3.80,0.15],["SCAN","Scangroup",   4.60,0.12],
+  ["NMG", "Nation Med", 14.00,0.40],["CTUM","Centum",     17.50,0.55],
+  ["KEGN","KenGen",      4.25,0.08],["BRIT","Britam",      7.80,0.20],
+  ["JUBI","Jubilee",   262.00,4.00],["CFC", "Stanbic",    83.00,1.50],
+  ["NBK", "National Bk", 5.10,0.12],["HF",  "HF Group",   3.90,0.10],
+];
+let nseData = NSE_STOCKS.map(([sym,name,base,vol])=>({
+  sym,name,price:base,base,vol,prevClose:base*(1+(Math.random()*.06-.03))
+}));
+const nseChg = d => d.price - d.prevClose;
+const nsePct = d => (nseChg(d)/d.prevClose)*100;
+function renderNSETicker(){
+  const inner=$("nse-ticker-inner"); if(!inner) return;
+  const items=[...nseData,...nseData];
+  inner.innerHTML=items.map(d=>{
+    const dir=nseChg(d)>=0?"up":"dn", arr=nseChg(d)>=0?"▲":"▼";
+    return `<span class="nse-tick-item"><span class="nse-tick-sym">${d.sym}</span><span class="nse-tick-price">${d.price.toFixed(2)}</span><span class="nse-tick-chg ${dir}">${arr} ${Math.abs(nsePct(d)).toFixed(2)}%</span></span><span class="nse-tick-sep">|</span>`;
+  }).join("");
+}
+function updateNSEPrices(){
+  nseData=nseData.map(d=>{
+    const move=(Math.random()-.499)*d.vol*.4;
+    const p=Math.max(d.base*.85,Math.min(d.base*1.15,d.price+move));
+    return{...d,price:parseFloat(p.toFixed(2))};
+  });
+  renderNSETicker();
+}
+renderNSETicker();
+setInterval(updateNSEPrices,4000);
+
+// ══════════════════════════════════════════════════════════════
+// FOREX RATES TICKER  (USD/KES · EUR/KES · GBP/KES + more)
+// ══════════════════════════════════════════════════════════════
+const FOREX_PAIRS = [
+  {pair:"USD/KES",base:129.50,vol:0.35,flag:"🇺🇸"},
+  {pair:"EUR/KES",base:140.20,vol:0.40,flag:"🇪🇺"},
+  {pair:"GBP/KES",base:164.80,vol:0.50,flag:"🇬🇧"},
+  {pair:"AED/KES",base: 35.25,vol:0.15,flag:"🇦🇪"},
+  {pair:"INR/KES",base:  1.56,vol:0.02,flag:"🇮🇳"},
+  {pair:"CNY/KES",base: 17.85,vol:0.12,flag:"🇨🇳"},
+  {pair:"ZAR/KES",base:  7.10,vol:0.08,flag:"🇿🇦"},
+  {pair:"TZS/KES",base:  0.05,vol:0.001,flag:"🇹🇿"},
+  {pair:"UGX/KES",base:  0.035,vol:0.001,flag:"🇺🇬"},
+];
+let forexData = FOREX_PAIRS.map(p=>({
+  ...p,rate:p.base,prevRate:p.base*(1+(Math.random()*.008-.004))
+}));
+function renderForexTicker(){
+  const inner=$("forex-ticker-inner"); if(!inner) return;
+  const items=[...forexData,...forexData];
+  inner.innerHTML=items.map(d=>{
+    const chg=d.rate-d.prevRate, pct=(chg/d.prevRate)*100;
+    const dir=chg>=0?"up":"dn", arr=chg>=0?"▲":"▼";
+    return `<span class="forex-item"><span class="forex-pair">${d.flag} ${d.pair}</span><span class="forex-rate">${d.rate.toFixed(d.rate<1?4:2)}</span><span class="forex-chg ${dir}">${arr}${Math.abs(pct).toFixed(2)}%</span></span><span class="forex-sep">·</span>`;
+  }).join("");
+  // Update clock
+  const t=$("forex-time");
+  if(t) t.textContent=new Date().toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" EAT";
+}
+function updateForex(){
+  forexData=forexData.map(d=>{
+    const move=(Math.random()-.499)*d.vol*.3;
+    const r=Math.max(d.base*.97,Math.min(d.base*1.03,d.rate+move));
+    return{...d,rate:parseFloat(r.toFixed(d.base<1?5:2))};
+  });
+  renderForexTicker();
+}
+renderForexTicker();
+setInterval(updateForex,5000);
+setInterval(()=>{ const t=$("forex-time"); if(t) t.textContent=new Date().toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" EAT"; },1000);
+
+// ══════════════════════════════════════════════════════════════
+// LIVE WITHDRAWAL FEED
+// ══════════════════════════════════════════════════════════════
+const KENYAN_NAMES = [
+  // Kikuyu / Central
+  "James Kamau","Grace Wanjiku","Peter Mwangi","Mary Wambui","John Kariuki",
+  "Faith Njeri","Samuel Gitau","Agnes Wangari","David Gichuki","Rose Wairimu",
+  // Luo / Nyanza
+  "Otieno Odhiambo","Adhiambo Auma","Ochieng Omondi","Awino Atieno","Onyango Ogola",
+  "Akinyi Okello","Odongo Opiyo","Nyawira Ojwang","Ouma Obiero","Akoth Nyamolo",
+  // Kalenjin / Rift Valley
+  "Kibet Rotich","Chebet Koech","Kipchoge Mutai","Jepchirchir Sang","Kiplangat Too",
+  "Ngetich Biwott","Cheruiyot Rono","Jeptoo Kerich","Kiprop Yego","Cherono Keter",
+  // Luhya / Western
+  "Wafula Simiyu","Nafula Barasa","Wekesa Indiasi","Nekesa Wanyama","Muyela Oduya",
+  "Khisa Mwale","Amukhale Andala","Wanjala Wafula","Nasambu Masinde","Wangila Mukhwana",
+  // Kamba / Eastern
+  "Mutua Mwangangi","Mwende Mutiso","Musyoka Mutunga","Nduku Mbuvi","Kioko Nzomo",
+  "Syomiti Kilonzo","Muema Nthuku","Wanza Mutuku","Ngui Ndambuki","Kavata Kyalo",
+  // Coastal / Mijikenda
+  "Hamisi Mwangi","Fatuma Charo","Karisa Ngala","Kadzo Kenga","Tsuma Mwanjala",
+  "Baya Katana","Dzombo Mwakio","Kazungu Kahindi","Masha Ngumbi","Sidi Mwanyika",
+  // Maasai / Kajiado
+  "Olesambu Kantai","Nkoidila Saitoti","Ntiampe Nalangu","Parsitau Lentoijoni",
+  // Meru / Tharaka
+  "Mugambi Muriungi","Gakii Muriuki","Ntiba Mwirigi","Kagwiria Muriithi",
+  // Somali / NFD
+  "Abdi Hassan","Fadumo Warsame","Nur Osman","Halima Mohamed",
+  // Kisii
+  "Nyamweya Omari","Bochaberi Mosoti","Kemunto Omwamba","Onsare Nyakundi",
+];
+const PLANS_SHORT = ["500","1,000","2,000","5,000","10,000","20,000"];
+const COUNTIES = ["Nairobi","Mombasa","Kisumu","Nakuru","Eldoret","Nyeri","Meru","Machakos","Kisii","Kakamega","Thika","Kitale","Garissa","Malindi","Nanyuki"];
+
+let feedItems = [];
+function randomFeedItem(){
+  const name = KENYAN_NAMES[Math.floor(Math.random()*KENYAN_NAMES.length)];
+  const plan = PLANS_SHORT[Math.floor(Math.random()*PLANS_SHORT.length)];
+  const gain = parseInt(plan.replace(/,/g,"")) * (Math.floor(Math.random()*6+5));
+  const county = COUNTIES[Math.floor(Math.random()*COUNTIES.length)];
+  const mins = Math.floor(Math.random()*55+2);
+  return {name, plan, county, mins, gain:"Ksh "+gain.toLocaleString()};
+}
+function renderFeedItem(item){
+  const initials=item.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  const hue=Math.floor(Math.random()*320);
+  return `<div class="feed-item">
+    <div class="feed-avatar" style="background:hsl(${hue},45%,32%)">${initials}</div>
+    <div class="feed-text">${item.name} · ${item.county} withdrew <strong>${item.gain}</strong></div>
+    <div class="feed-time">${item.mins}m ago</div>
+  </div>`;
+}
+function initFeed(){
+  const el=$("live-feed-scroll"); if(!el) return;
+  // Seed with 3 items
+  for(let i=0;i<3;i++) feedItems.push(randomFeedItem());
+  el.innerHTML=feedItems.map(renderFeedItem).join("");
+}
+function pushFeedItem(){
+  const el=$("live-feed-scroll"); if(!el) return;
+  const item=randomFeedItem();
+  feedItems.unshift(item);
+  if(feedItems.length>6) feedItems.pop();
+  const div=document.createElement("div");
+  div.innerHTML=renderFeedItem(item);
+  el.insertBefore(div.firstChild,el.firstChild);
+  // Remove last if overflow
+  while(el.children.length>4) el.removeChild(el.lastChild);
+}
+initFeed();
+setInterval(pushFeedItem, 6000+Math.random()*4000);
+
+// ══════════════════════════════════════════════════════════════
+// TESTIMONIALS CAROUSEL
+// ══════════════════════════════════════════════════════════════
+const TESTIMONIALS = [
+  {name:"Grace Wanjiku",loc:"Westlands, Nairobi",amount:"Ksh 25,000",plan:"Ksh 5,000 plan",text:"I was skeptical at first but the M-PESA confirmation made it feel real. Withdrew my profits in 10 days!",stars:5},
+  {name:"Otieno Odhiambo",loc:"Kisumu City",amount:"Ksh 50,000",plan:"Ksh 10,000 plan",text:"Razor Chart changed my life. I reinvested three times and now I'm earning consistently. Asante sana!",stars:5},
+  {name:"Chebet Koech",loc:"Eldoret",amount:"Ksh 15,000",plan:"Ksh 2,000 plan",text:"Simple to use, M-PESA is instant. My sister referred me and we both benefited from the referral bonus.",stars:5},
+  {name:"Wafula Simiyu",loc:"Kakamega",amount:"Ksh 80,000",plan:"Ksh 20,000 plan",text:"The dashboard shows real-time growth. I can see my money growing daily. Already referred 4 friends!",stars:5},
+  {name:"Mutua Mwangangi",loc:"Machakos",amount:"Ksh 12,500",plan:"Ksh 2,000 plan",text:"I deposited on a Monday and by Friday my balance had grown massively. Payout was instant!",stars:5},
+  {name:"Akinyi Okello",loc:"Kisumu",amount:"Ksh 35,000",plan:"Ksh 5,000 plan",text:"The referral system is amazing. My referral code helped me earn an extra Ksh 500 bonus on top of my profits.",stars:5},
+  {name:"Hamisi Mwangi",loc:"Mombasa",amount:"Ksh 200,000",plan:"Ksh 50,000 plan",text:"Biggest return I've ever seen. Verified through M-PESA so I trusted it. Will invest again.",stars:5},
+  {name:"Jepchirchir Sang",loc:"Nakuru",amount:"Ksh 7,000",plan:"Ksh 1,000 plan",text:"Started small to test it. Got my payout and reinvested immediately. The growth tracker is motivating!",stars:5},
+  {name:"Bochaberi Mosoti",loc:"Kisii",amount:"Ksh 28,000",plan:"Ksh 5,000 plan",text:"Nimefurahi sana! Pesa yangu ilikua haraka. Niliweza kulipa school fees ya mtoto wangu.",stars:5},
+  {name:"Abdi Hassan",loc:"Garissa",amount:"Ksh 42,000",plan:"Ksh 10,000 plan",text:"Never thought investment this simple existed. Everything is on phone. M-PESA in, M-PESA out.",stars:5},
+  {name:"Mwende Mutiso",loc:"Kitui",amount:"Ksh 17,500",plan:"Ksh 2,000 plan",text:"The live withdrawal feed on the login page convinced me it was real. Now I'm part of that feed!",stars:5},
+  {name:"Nkoidila Saitoti",loc:"Kajiado",amount:"Ksh 100,000",plan:"Ksh 20,000 plan",text:"As a Maasai businessman I am always cautious. This platform delivered. Asante Razor Chart.",stars:5},
+];
+function renderTestimonials(){
+  const inner=$("testi-inner"); if(!inner) return;
+  const items=[...TESTIMONIALS,...TESTIMONIALS];
+  inner.innerHTML=items.map((t,i)=>{
+    const initials=t.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const hue=(i*29)%360;
+    return `<div class="testi-card">
+      <div class="testi-top">
+        <div class="testi-avatar" style="background:hsl(${hue},40%,30%)">${initials}</div>
+        <div><div class="testi-name">${t.name}</div><div class="testi-loc">📍 ${t.loc}</div></div>
+      </div>
+      <div class="testi-stars">${"★".repeat(t.stars)}</div>
+      <div class="testi-text">"${t.text}"</div>
+      <div class="testi-amount">✓ Withdrew ${t.amount} · ${t.plan}</div>
+    </div>`;
+  }).join("");
+}
+renderTestimonials();
+
+// ══════════════════════════════════════════════════════════════
+// REFERRAL LEADERBOARD
+// ══════════════════════════════════════════════════════════════
+let lbSortMode = "referrals";
+window.switchLbTab = mode => {
+  lbSortMode = mode;
+  document.querySelectorAll(".lb-tab").forEach((t,i)=>{
+    t.classList.toggle("lb-tab-active",i===(mode==="referrals"?0:1));
+  });
+  renderLeaderboard();
+};
+
+// Static seed leaderboard for platforms that don't yet have real Firebase leaderboard data
+// Real data is pulled from Firebase below; this is a fallback/seed
+const LB_SEED = [
+  {name:"James Kamau",     county:"Nairobi",    refs:14, earned:1400},
+  {name:"Adhiambo Auma",   county:"Kisumu",     refs:11, earned:1100},
+  {name:"Kibet Rotich",    county:"Eldoret",    refs:9,  earned: 900},
+  {name:"Grace Wanjiku",   county:"Thika",      refs:8,  earned: 800},
+  {name:"Wafula Simiyu",   county:"Kakamega",   refs:7,  earned: 700},
+  {name:"Mutua Mwangangi", county:"Machakos",   refs:6,  earned: 600},
+  {name:"Chebet Koech",    county:"Nakuru",     refs:5,  earned: 500},
+  {name:"Hamisi Mwangi",   county:"Mombasa",    refs:4,  earned: 400},
+  {name:"Akinyi Okello",   county:"Kisumu",     refs:3,  earned: 300},
+  {name:"Nyamweya Omari",  county:"Kisii",      refs:2,  earned: 200},
+];
+
+function renderLeaderboard(firebaseRows){
+  const el=$("leaderboard-list"); if(!el) return;
+  const rows = firebaseRows || LB_SEED;
+  const sorted = [...rows].sort((a,b)=>lbSortMode==="referrals"?b.refs-a.refs:b.earned-a.earned);
+  const medals=["🥇","🥈","🥉"];
+  const rankClass=["r1","r2","r3"];
+
+  if(!sorted.length){
+    el.innerHTML=`<div class="lb-empty">No leaderboard data yet. Be the first to refer friends!</div>`;
+    return;
+  }
+
+  el.innerHTML = sorted.slice(0,10).map((row,i)=>{
+    const isYou = currentUser && (row.uid===currentUser.uid);
+    const initials=(row.name||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const hue=(i*37+20)%360;
+    const medal = i<3 ? medals[i] : "";
+    const rClass = i<3 ? rankClass[i] : "rn";
+    return `<div class="lb-row ${isYou?"lb-you":""}">
+      <div class="lb-rank ${rClass}">${i+1}</div>
+      <div class="lb-medal">${medal}</div>
+      <div class="lb-avatar" style="background:hsl(${hue},40%,30%)">${initials}</div>
+      <div class="lb-info">
+        <div class="lb-name">${row.name} ${isYou?'<span class="lb-you-tag">YOU</span>':""}</div>
+        <div class="lb-name-sub">📍 ${row.county||"Kenya"}</div>
+      </div>
+      <div>
+        <div class="lb-refs">${row.refs} refs</div>
+        <div class="lb-earned">+Ksh ${(row.earned||0).toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// Load leaderboard from Firebase (aggregate from all users' referrals)
+// This reads the public leaderboard node we write to when referrals are completed
+async function loadLeaderboard(){
+  try {
+    const snap = await get(ref(db,"leaderboard"));
+    if(snap.exists()){
+      const rows=[];
+      snap.forEach(c=>rows.push({uid:c.key,...c.val()}));
+      renderLeaderboard(rows);
+    } else {
+      renderLeaderboard(); // show seed
+    }
+  } catch(e){ renderLeaderboard(); }
+}
+
+// Update leaderboard entry for current user whenever their referrals change
+async function updateLeaderboardEntry(uid,name,county,refs,earned){
+  try{
+    await update(ref(db,`leaderboard/${uid}`),{name,county,refs,earned,updatedAt:Date.now()});
+  }catch(e){}
+}
+
+// ── FIREBASE CONNECTIVITY CHECK ──────────────────────────────────
+const connRef = ref(db, ".info/connected");
+onValue(connRef, snap => {
+  const badge=$("fb-status-badge");
+  const lbl  =$("fb-status-txt");
+  if(!badge||!lbl) return;
+  if(snap.val()===true){
+    badge.className="fb-status ok";
+    lbl.textContent="Firebase Connected";
+    setTimeout(()=>{ badge.style.opacity="0"; badge.style.transition="opacity 1s"; },5000);
+  } else {
+    badge.className="fb-status err";
+    lbl.textContent="Firebase Offline";
+    badge.style.opacity="0.9";
+    badge.style.transition="";
+  }
+});
+
+// ── LOAD LEADERBOARD ON TAB CLICK ───────────────────────────────
+document.querySelectorAll(".dash-tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    if(t.textContent.includes("Referral")) loadLeaderboard();
+  });
+});
+renderLeaderboard(); // seed immediately
+
+// ══════════════════════════════════════════════════════════════
+// TERMS & CONDITIONS
+// ══════════════════════════════════════════════════════════════
+window.openTNC = () => {
+  const el = document.getElementById("tnc-modal");
+  if (el) el.classList.add("open");
+};
+window.closeTNC = () => {
+  const el = document.getElementById("tnc-modal");
+  if (el) el.classList.remove("open");
+};
+// Close on backdrop click
+document.getElementById("tnc-modal")?.addEventListener("click", e => {
+  if (e.target === document.getElementById("tnc-modal")) closeTNC();
+});
+
+// ══════════════════════════════════════════════════════════════
+// PORTFOLIO CHARTS ENGINE
+// ══════════════════════════════════════════════════════════════
+let growthChartInst = null;
+let allocChartInst  = null;
+let profitSplitInst = null;
+let dailyChartInst  = null;
+let currentChartView = "growth";
+
+const CHART_COLORS = {
+  green:      "#1FD67A",
+  greenFade:  "rgba(31,214,122,0.15)",
+  gold:       "#F5C842",
+  goldFade:   "rgba(245,200,66,0.12)",
+  blue:       "#4A9EFF",
+  blueFade:   "rgba(74,158,255,0.12)",
+  red:        "#F04E4E",
+  redFade:    "rgba(240,78,78,0.15)",
+  muted:      "rgba(107,113,128,0.5)",
+  grid:       "rgba(255,255,255,0.05)",
+  text:       "#6b7180",
+};
+
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: "#161924",
+      borderColor: "rgba(212,160,23,0.3)",
+      borderWidth: 1,
+      titleColor: "#F5C842",
+      bodyColor: "#e8e4d8",
+      padding: 12,
+      titleFont: { family: "'Space Mono', monospace", size: 11 },
+      bodyFont:  { family: "'Space Mono', monospace", size: 11 },
+      callbacks: {
+        label: ctx => " Ksh " + (ctx.parsed.y ?? ctx.parsed).toLocaleString(),
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: CHART_COLORS.grid },
+      ticks: { color: CHART_COLORS.text, font: { family: "'Space Mono',monospace", size: 10 }, maxTicksLimit: 8 },
+      border: { color: CHART_COLORS.grid },
+    },
+    y: {
+      grid: { color: CHART_COLORS.grid },
+      ticks: {
+        color: CHART_COLORS.text,
+        font: { family: "'Space Mono',monospace", size: 10 },
+        callback: v => "Ksh " + (v >= 1000 ? (v/1000).toFixed(1)+"K" : v),
+      },
+      border: { color: CHART_COLORS.grid },
+    }
+  }
+};
+
+function buildGrowthData(investments) {
+  // Generate day-by-day growth history for all active investments combined
+  const maxDays = Math.max(...investments.map(i => i.days || 7), 7);
+  const labels  = [];
+  const balances = [];
+  const deposits = [];
+  const targets  = [];
+
+  let totalDeposit = investments.reduce((s, i) => s + (i.deposit || 0), 0);
+  let totalTarget  = investments.reduce((s, i) => s + (i.target  || 0), 0);
+
+  for (let d = 0; d <= maxDays; d++) {
+    labels.push(d === 0 ? "Start" : `Day ${d}`);
+    const bal = investments.reduce((s, i) => {
+      const dayBal = (i.deposit || 0) * Math.pow(1.28, Math.min(d, i.days || 7));
+      return s + Math.min(dayBal, i.target || dayBal);
+    }, 0);
+    balances.push(Math.round(bal));
+    deposits.push(Math.round(totalDeposit));
+    targets.push(Math.round(totalTarget));
+  }
+  return { labels, balances, deposits, targets };
+}
+
+function buildDailyPnL(investments) {
+  const days = Math.max(...investments.map(i => i.days || 7), 7);
+  const labels = [];
+  const profits = [];
+  for (let d = 1; d <= days; d++) {
+    labels.push(`D${d}`);
+    const dayProfit = investments.reduce((s, i) => {
+      if (d > (i.days || 7)) return s;
+      const prev = (i.deposit || 0) * Math.pow(1.28, d - 1);
+      const curr = (i.deposit || 0) * Math.pow(1.28, d);
+      return s + Math.min(curr, i.target || curr) - Math.min(prev, i.target || prev);
+    }, 0);
+    profits.push(Math.round(dayProfit));
+  }
+  return { labels, profits };
+}
+
+function updateOHLC(investments) {
+  if (!investments.length) return;
+  const totalDeposit  = investments.reduce((s, i) => s + (i.deposit || 0), 0);
+  const totalBalance  = investments.reduce((s, i) => s + (i.currentBalance || i.deposit || 0), 0);
+  const totalTarget   = investments.reduce((s, i) => s + (i.target || 0), 0);
+  const totalProfit   = Math.max(0, totalBalance - totalDeposit);
+  const roi           = totalDeposit ? ((totalProfit / totalDeposit) * 100) : 0;
+  const dailyChange   = totalDeposit * 0.28;
+
+  const el = id => document.getElementById(id);
+  const k  = n => "Ksh " + Math.round(n).toLocaleString();
+
+  el("ohlc-open")   && (el("ohlc-open").textContent   = k(totalDeposit));
+  el("ohlc-high")   && (el("ohlc-high").textContent   = k(totalTarget));
+  el("ohlc-low")    && (el("ohlc-low").textContent    = k(totalDeposit));
+  el("ohlc-close")  && (el("ohlc-close").textContent  = k(totalBalance));
+  el("ohlc-profit") && (el("ohlc-profit").textContent = "+" + k(totalProfit));
+  el("ohlc-roi")    && (el("ohlc-roi").textContent    = "+" + roi.toFixed(1) + "%");
+  el("ohlc-change") && (el("ohlc-change").textContent = "+" + k(dailyChange) + "/day");
+}
+
+window.renderPortfolioCharts = function(investments) {
+  if (!investments || !investments.length) return;
+  const active = investments.filter(i => i.status !== "withdrawn");
+  if (!active.length) return;
+
+  document.getElementById("portfolio-charts").style.display = "block";
+  updateOHLC(active);
+
+  // ── GROWTH CHART ──────────────────────────────────────────────
+  const { labels, balances, deposits, targets } = buildGrowthData(active);
+  const gCtx = document.getElementById("growthChart")?.getContext("2d");
+  if (gCtx) {
+    if (growthChartInst) growthChartInst.destroy();
+    const makeGrad = (ctx, c1, c2) => {
+      const g = ctx.createLinearGradient(0, 0, 0, 220);
+      g.addColorStop(0, c1); g.addColorStop(1, c2); return g;
+    };
+    growthChartInst = new Chart(gCtx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Balance",
+            data: balances,
+            borderColor: CHART_COLORS.green,
+            backgroundColor: makeGrad(gCtx, CHART_COLORS.greenFade, "rgba(31,214,122,0)"),
+            borderWidth: 2.5,
+            pointBackgroundColor: CHART_COLORS.green,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.4,
+          },
+          {
+            label: "Deposit",
+            data: deposits,
+            borderColor: CHART_COLORS.gold,
+            backgroundColor: "transparent",
+            borderWidth: 1.5,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+            tension: 0,
+          },
+          {
+            label: "Target",
+            data: targets,
+            borderColor: CHART_COLORS.blue,
+            backgroundColor: "transparent",
+            borderWidth: 1.5,
+            borderDash: [3, 3],
+            pointRadius: 0,
+            fill: false,
+            tension: 0,
+          }
+        ]
+      },
+      options: {
+        ...CHART_DEFAULTS,
+        plugins: {
+          ...CHART_DEFAULTS.plugins,
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: Ksh ${ctx.parsed.y.toLocaleString()}`,
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // ── ALLOCATION DONUT ──────────────────────────────────────────
+  const aCtx = document.getElementById("allocChart")?.getContext("2d");
+  if (aCtx) {
+    if (allocChartInst) allocChartInst.destroy();
+    const planColors = ["#1FD67A","#F5C842","#4A9EFF","#F04E4E","#a78bfa","#fb923c"];
+    allocChartInst = new Chart(aCtx, {
+      type: "doughnut",
+      data: {
+        labels: active.map(i => fmt(i.deposit) + " Plan"),
+        datasets: [{
+          data: active.map(i => i.deposit || 0),
+          backgroundColor: active.map((_, k) => planColors[k % planColors.length]),
+          borderColor: "#111420",
+          borderWidth: 3,
+          hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "62%",
+        plugins: {
+          legend: {
+            display: true,
+            position: "bottom",
+            labels: {
+              color: CHART_COLORS.text,
+              font: { family: "'Space Mono',monospace", size: 10 },
+              padding: 10,
+              boxWidth: 12,
+            }
+          },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: { label: ctx => ` ${ctx.label}: Ksh ${ctx.parsed.toLocaleString()}` }
+          }
+        }
+      }
+    });
+  }
+
+  // ── PROFIT vs DEPOSIT DONUT ───────────────────────────────────
+  const pCtx = document.getElementById("profitSplitChart")?.getContext("2d");
+  if (pCtx) {
+    if (profitSplitInst) profitSplitInst.destroy();
+    const totalDep = active.reduce((s, i) => s + (i.deposit || 0), 0);
+    const totalBal = active.reduce((s, i) => s + (i.currentBalance || i.deposit || 0), 0);
+    const profit   = Math.max(0, totalBal - totalDep);
+    profitSplitInst = new Chart(pCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Deposit", "Profit Earned"],
+        datasets: [{
+          data: [totalDep, profit],
+          backgroundColor: [CHART_COLORS.goldFade.replace("0.12","0.6"), CHART_COLORS.green],
+          borderColor: "#111420",
+          borderWidth: 3,
+          hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "62%",
+        plugins: {
+          legend: {
+            display: true,
+            position: "bottom",
+            labels: { color: CHART_COLORS.text, font: { family: "'Space Mono',monospace", size: 10 }, padding: 10, boxWidth: 12 }
+          },
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: { label: ctx => ` ${ctx.label}: Ksh ${ctx.parsed.toLocaleString()}` }
+          }
+        }
+      }
+    });
+  }
+
+  // ── DAILY P&L BAR CHART ───────────────────────────────────────
+  const dCtx = document.getElementById("dailyChart")?.getContext("2d");
+  if (dCtx) {
+    if (dailyChartInst) dailyChartInst.destroy();
+    const { labels: dLabels, profits } = buildDailyPnL(active);
+    dailyChartInst = new Chart(dCtx, {
+      type: "bar",
+      data: {
+        labels: dLabels,
+        datasets: [{
+          label: "Daily Profit",
+          data: profits,
+          backgroundColor: profits.map(p => p >= 0 ? CHART_COLORS.green : CHART_COLORS.red),
+          borderRadius: 4,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        ...CHART_DEFAULTS,
+        plugins: {
+          ...CHART_DEFAULTS.plugins,
+          tooltip: {
+            ...CHART_DEFAULTS.plugins.tooltip,
+            callbacks: { label: ctx => ` Profit: Ksh ${ctx.parsed.y.toLocaleString()}` }
+          }
+        }
+      }
+    });
+  }
+};
+
+window.switchChartView = function(view) {
+  currentChartView = view;
+  ["growth","allocation","daily"].forEach(v => {
+    const el = document.getElementById("chart-" + v);
+    if (el) el.style.display = v === view ? "block" : "none";
+  });
+  document.querySelectorAll(".chart-tab").forEach((t, i) => {
+    t.classList.toggle("ct-active", ["growth","allocation","daily"][i] === view);
+  });
+};
+
+
+</script>
+</body>
+</html>
