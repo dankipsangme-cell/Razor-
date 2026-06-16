@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#050608"/>
+<meta name="description" content="Razor Chart — Live Forex Signals, Investment Plans & 28% Daily Returns. Kenya's Premier Digital Investment Platform."/>
+<title>Razor Chart — Forex Signals & Investment Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#D4A017;--gold-l:#F5C842;--gold-d:#8a6510;
+  --black:#050608;--dark:#0d0f14;--card:#111420;--card2:#161924;
+  --border:rgba(212,160,23,.18);--border2:rgba(255,255,255,.06);
+  --text:#e8e4d8;--muted:#6b7180;--muted2:#4a4f60;
+  --green:#1FD67A;--red:#F04E4E;--blue:#4A9EFF;
+  --r:14px;--r2:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(212,160,23,.09) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 5% 100%,rgba(212,160,23,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.03) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+/* ══ NAV ══════════════════════════════════════════════════════════ */
+.top-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(5,6,8,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}
+.nav-logo-hex{width:32px;height:32px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-logo-hex svg{width:14px;height:14px;fill:#000}
+.nav-logo span{color:var(--gold)}
+.nav-cta-group{display:flex;align-items:center;gap:10px}
+.nav-login-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9px;cursor:pointer;transition:all .2s;text-decoration:none}
+.nav-login-btn:hover{border-color:var(--gold);color:var(--gold)}
+.nav-signup-btn{background:linear-gradient(135deg,var(--gold-d),var(--gold-l));color:#000;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;padding:9px 18px;border-radius:9px;cursor:pointer;transition:all .2s;text-decoration:none;border:none}
+.nav-signup-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(212,160,23,.35)}
+@media(max-width:600px){.top-nav{padding:14px 16px}.nav-login-btn{display:none}}
+
+/* ══ HERO ══════════════════════════════════════════════════════════ */
+.hero{position:relative;z-index:1;padding:80px 40px 60px;text-align:center;max-width:800px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.22);border-radius:50px;padding:6px 16px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--gold);letter-spacing:.5px;margin-bottom:24px}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:18px}
+.hero h1 .hl{color:var(--gold)}
+.hero-sub{font-size:1rem;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:560px;margin-left:auto;margin-right:auto}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:linear-gradient(135deg,var(--gold-d),var(--gold-l));color:#000;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;padding:15px 32px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(212,160,23,.4)}
+.btn-secondary{background:transparent;color:var(--text);font-family:'Syne',sans-serif;font-size:1rem;font-weight:600;padding:15px 32px;border-radius:12px;border:1px solid var(--border2);cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ══ LIVE TICKER ═══════════════════════════════════════════════════ */
+.ticker-wrap{position:relative;z-index:1;background:rgba(212,160,23,.04);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 0;overflow:hidden;white-space:nowrap;margin-bottom:0}
+.ticker-inner{display:inline-flex;gap:40px;animation:ticker 30s linear infinite}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:.72rem}
+.ticker-pair{color:var(--text);font-weight:700}
+.ticker-price{color:var(--muted)}
+.ticker-change.up{color:var(--green)}
+.ticker-change.dn{color:var(--red)}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ══ STATS ROW ═════════════════════════════════════════════════════ */
+.stats-row{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:40px;max-width:1100px;margin:0 auto}
+@media(max-width:768px){.stats-row{grid-template-columns:1fr 1fr;padding:24px 16px}}
+@media(max-width:400px){.stats-row{grid-template-columns:1fr}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;text-align:center}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+.stat-val{font-size:1.8rem;font-weight:800;color:var(--gold-l);font-family:'Space Mono',monospace;letter-spacing:-1px;margin-bottom:4px}
+.stat-val.green{color:var(--green)}
+.stat-label{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px}
+
+/* ══ SIGNALS SECTION ═══════════════════════════════════════════════ */
+.section{position:relative;z-index:1;padding:40px;max-width:1100px;margin:0 auto}
+@media(max-width:768px){.section{padding:24px 16px}}
+.section-title{font-size:1.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+.section-title span{color:var(--gold)}
+.section-sub{font-size:.85rem;color:var(--muted);margin-bottom:28px}
+.signals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+.signal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.signal-card:hover{border-color:rgba(212,160,23,.5);transform:translateY(-3px)}
+.sig-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sig-pair{font-size:1.1rem;font-weight:800;letter-spacing:-.3px}
+.sig-type{font-size:.65rem;font-family:'Space Mono',monospace;font-weight:700;padding:4px 10px;border-radius:5px;letter-spacing:.5px}
+.sig-type.buy{background:rgba(31,214,122,.15);color:var(--green);border:1px solid rgba(31,214,122,.3)}
+.sig-type.sell{background:rgba(240,78,78,.12);color:var(--red);border:1px solid rgba(240,78,78,.25)}
+.sig-levels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.sig-level{background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:10px;text-align:center}
+.sig-level-label{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.3px;margin-bottom:3px}
+.sig-level-val{font-size:.88rem;font-weight:700;font-family:'Space Mono',monospace}
+.sig-level-val.entry{color:var(--text)}
+.sig-level-val.tp{color:var(--green)}
+.sig-level-val.sl{color:var(--red)}
+.sig-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.sig-timeframe{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.sig-strength{display:flex;align-items:center;gap:5px;font-size:.65rem;font-family:'Space Mono',monospace}
+.sig-strength-dots{display:flex;gap:2px}
+.sig-dot{width:6px;height:6px;border-radius:50%}
+.sig-dot.fill{background:var(--gold)}
+.sig-dot.empty{background:var(--muted2)}
+.sig-status{font-size:.62rem;font-family:'Space Mono',monospace;padding:3px 8px;border-radius:4px;background:rgba(212,160,23,.1);color:var(--gold);border:1px solid rgba(212,160,23,.2)}
+.sig-status.active{background:rgba(31,214,122,.1);color:var(--green);border-color:rgba(31,214,122,.25)}
+
+/* lock overlay on signals */
+.sig-lock{position:absolute;inset:0;background:rgba(5,6,8,.75);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:var(--r);text-align:center;padding:16px}
+.sig-lock-icon{font-size:1.8rem}
+.sig-lock-text{font-size:.78rem;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.5}
+.sig-lock-btn{background:linear-gradient(135deg,var(--gold-d),var(--gold-l));color:#000;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;margin-top:4px;text-decoration:none}
+
+/* ══ HOW IT WORKS ══════════════════════════════════════════════════ */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.step-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:24px;position:relative}
+.step-num{font-size:.65rem;font-family:'Space Mono',monospace;color:var(--gold);letter-spacing:.5px;margin-bottom:10px}
+.step-icon{font-size:1.8rem;margin-bottom:10px}
+.step-title{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.step-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* ══ PLANS PREVIEW ═════════════════════════════════════════════════ */
+.plans-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.plan-prev-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+.plan-prev-card:hover{transform:translateY(-3px);border-color:rgba(212,160,23,.45)}
+.plan-prev-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+.pp-deposit{font-size:1.4rem;font-weight:800;color:var(--gold-l);font-family:'Space Mono',monospace;margin-bottom:2px}
+.pp-target{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.pp-target strong{color:var(--green)}
+.pp-return{font-size:.7rem;font-family:'Space Mono',monospace;background:rgba(31,214,122,.08);border:1px solid rgba(31,214,122,.15);border-radius:6px;padding:5px 10px;color:var(--green);display:inline-block;margin-bottom:14px}
+.pp-btn{width:100%;padding:9px;background:rgba(212,160,23,.1);border:1px solid var(--border);color:var(--gold);font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;border-radius:8px;cursor:pointer;text-decoration:none;display:block;transition:all .2s}
+.pp-btn:hover{background:linear-gradient(135deg,var(--gold-d),var(--gold-l));color:#000;border-color:transparent}
+
+/* ══ TESTIMONIALS ══════════════════════════════════════════════════ */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.testi-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:20px}
+.tc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.tc-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0}
+.tc-name{font-size:.88rem;font-weight:700}
+.tc-loc{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.tc-text{font-size:.8rem;color:var(--muted);line-height:1.6;font-style:italic;margin-bottom:10px}
+.tc-earned{font-size:.72rem;font-family:'Space Mono',monospace;color:var(--green);font-weight:700}
+
+/* ══ CTA BANNER ════════════════════════════════════════════════════ */
+.cta-banner{position:relative;z-index:1;margin:20px 40px 60px;background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));border:1px solid rgba(212,160,23,.25);border-radius:var(--r2);padding:48px 40px;text-align:center}
+@media(max-width:768px){.cta-banner{margin:20px 16px 60px;padding:36px 20px}}
+.cta-banner h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;letter-spacing:-1px;margin-bottom:12px}
+.cta-banner h2 span{color:var(--gold)}
+.cta-banner p{font-size:.9rem;color:var(--muted);margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7}
+.cta-trust{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px}
+.cta-trust-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace}
+
+/* ══ FOOTER ════════════════════════════════════════════════════════ */
+.site-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:28px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+@media(max-width:600px){.site-footer{padding:24px 16px;flex-direction:column;text-align:center}}
+.footer-brand{font-weight:700;font-size:.9rem}
+.footer-brand span{color:var(--gold)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace;text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.footer-note{font-size:.65rem;color:var(--muted2);font-family:'Space Mono',monospace;width:100%;border-top:1px solid var(--border2);padding-top:16px;margin-top:4px;line-height:1.6;text-align:center}
+
+/* ══ LIVE FEED BAR ═════════════════════════════════════════════════ */
+.live-withdrawals{position:relative;z-index:1;padding:0 40px;margin-bottom:40px}
+@media(max-width:768px){.live-withdrawals{padding:0 16px}}
+.lw-label{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.lw-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
+.lw-feed{display:flex;flex-direction:column;gap:8px}
+.lw-item{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;font-size:.78rem}
+.lw-name{font-weight:700}
+.lw-plan{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+.lw-amount{font-family:'Space Mono',monospace;color:var(--green);font-weight:700}
+.lw-time{font-size:.65rem;color:var(--muted2);font-family:'Space Mono',monospace}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <a href="portal.html" class="nav-logo">
+    <div class="nav-logo-hex">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    Razor <span>Chart</span>
+  </a>
+  <div class="nav-cta-group">
+    <a href="index.html?tab=login" class="nav-login-btn">Sign In</a>
+    <a href="index.html?tab=register" class="nav-signup-btn">Get Started →</a>
+  </div>
+</nav>
+
+<!-- LIVE FOREX TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker-inner">
+    <!-- duplicated for seamless loop -->
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow"><div class="hero-dot"></div> LIVE FOREX SIGNALS · KENYA'S #1 INVESTMENT PLATFORM</div>
+  <h1>Trade Smarter.<br>Earn <span class="hl">28% Daily</span><br>Grow Faster.</h1>
+  <p class="hero-sub">Access professional-grade forex trading signals, invest in high-yield plans from Ksh 500, and watch your money grow — all through M-PESA.</p>
+  <div class="hero-btns">
+    <a href="index.html?tab=register" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Start Investing Free
+    </a>
+    <a href="index.html?tab=login" class="btn-secondary">Sign In to Dashboard</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-val">28%</div>
+    <div class="stat-label">DAILY RETURN RATE</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val green">14,800+</div>
+    <div class="stat-label">ACTIVE INVESTORS</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val">Ksh 500</div>
+    <div class="stat-label">MINIMUM DEPOSIT</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val green">98.4%</div>
+    <div class="stat-label">SIGNAL ACCURACY</div>
+  </div>
+</div>
+
+<!-- FOREX SIGNALS -->
+<div class="section">
+  <div class="section-title">📡 Live Forex <span>Trading Signals</span></div>
+  <div class="section-sub">Professional signals updated in real-time. Sign in to unlock all signals with full entry, TP, and SL levels.</div>
+
+  <div class="signals-grid">
+
+    <!-- Signal 1 — FREE/VISIBLE -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">EUR/USD</div>
+        <div class="sig-type buy">BUY</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">1.0847</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">1.0920</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">1.0790</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ H4 · FOREX</div>
+        <div class="sig-strength">
+          STRENGTH
+          <div class="sig-strength-dots">
+            <div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot empty"></div>
+          </div>
+        </div>
+        <div class="sig-status active">● ACTIVE</div>
+      </div>
+    </div>
+
+    <!-- Signal 2 — FREE/VISIBLE -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">GBP/JPY</div>
+        <div class="sig-type sell">SELL</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">196.42</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">194.80</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">197.50</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ H1 · FOREX</div>
+        <div class="sig-strength">
+          STRENGTH
+          <div class="sig-strength-dots">
+            <div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div>
+          </div>
+        </div>
+        <div class="sig-status active">● ACTIVE</div>
+      </div>
+    </div>
+
+    <!-- Signal 3 — FREE/VISIBLE -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">XAU/USD</div>
+        <div class="sig-type buy">BUY</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">2,318.50</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">2,345.00</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">2,295.00</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ D1 · GOLD</div>
+        <div class="sig-strength">
+          STRENGTH
+          <div class="sig-strength-dots">
+            <div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot fill"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div>
+          </div>
+        </div>
+        <div class="sig-status active">● ACTIVE</div>
+      </div>
+    </div>
+
+    <!-- Signal 4 — LOCKED -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">USD/KES</div>
+        <div class="sig-type sell">SELL</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">— — —</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ H4 · FOREX</div>
+        <div class="sig-strength">STRENGTH <div class="sig-strength-dots"><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div></div></div>
+        <div class="sig-status">LOCKED</div>
+      </div>
+      <div class="sig-lock">
+        <div class="sig-lock-icon">🔒</div>
+        <div class="sig-lock-text">Sign in to unlock<br>full signal details</div>
+        <a href="index.html?tab=login" class="sig-lock-btn">Unlock Free →</a>
+      </div>
+    </div>
+
+    <!-- Signal 5 — LOCKED -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">AUD/USD</div>
+        <div class="sig-type buy">BUY</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">— — —</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ H1 · FOREX</div>
+        <div class="sig-strength">STRENGTH <div class="sig-strength-dots"><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div></div></div>
+        <div class="sig-status">LOCKED</div>
+      </div>
+      <div class="sig-lock">
+        <div class="sig-lock-icon">🔒</div>
+        <div class="sig-lock-text">Sign in to unlock<br>full signal details</div>
+        <a href="index.html?tab=login" class="sig-lock-btn">Unlock Free →</a>
+      </div>
+    </div>
+
+    <!-- Signal 6 — LOCKED -->
+    <div class="signal-card">
+      <div class="sig-header">
+        <div class="sig-pair">USD/CHF</div>
+        <div class="sig-type sell">SELL</div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level"><div class="sig-level-label">ENTRY</div><div class="sig-level-val entry">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">TAKE PROFIT</div><div class="sig-level-val tp">— — —</div></div>
+        <div class="sig-level"><div class="sig-level-label">STOP LOSS</div><div class="sig-level-val sl">— — —</div></div>
+      </div>
+      <div class="sig-meta">
+        <div class="sig-timeframe">⏱ D1 · FOREX</div>
+        <div class="sig-strength">STRENGTH <div class="sig-strength-dots"><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div><div class="sig-dot empty"></div></div></div>
+        <div class="sig-status">LOCKED</div>
+      </div>
+      <div class="sig-lock">
+        <div class="sig-lock-icon">🔒</div>
+        <div class="sig-lock-text">Sign in to unlock<br>full signal details</div>
+        <a href="index.html?tab=login" class="sig-lock-btn">Unlock Free →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIVE WITHDRAWALS FEED -->
+<div class="live-withdrawals">
+  <div class="lw-label"><div class="lw-dot"></div> RECENT WITHDRAWALS · LIVE</div>
+  <div class="lw-feed" id="lw-feed"></div>
+</div>
+
+<!-- INVESTMENT PLANS PREVIEW -->
+<div class="section">
+  <div class="section-title">💰 Investment <span>Plans</span></div>
+  <div class="section-sub">Choose a plan, pay via M-PESA, and earn 28% daily until your target is reached.</div>
+  <div class="plans-preview">
+    <div class="plan-prev-card">
+      <div class="pp-deposit">Ksh 500</div>
+      <div class="pp-target">Target: <strong>Ksh 3,500</strong> · 7 days</div>
+      <div class="pp-return">+600% Total Return</div>
+      <a href="index.html?tab=register" class="pp-btn">Start with Ksh 500 →</a>
+    </div>
+    <div class="plan-prev-card">
+      <div class="pp-deposit">Ksh 2,000</div>
+      <div class="pp-target">Target: <strong>Ksh 15,000</strong> · 10 days</div>
+      <div class="pp-return">+650% Total Return</div>
+      <a href="index.html?tab=register" class="pp-btn">Start with Ksh 2,000 →</a>
+    </div>
+    <div class="plan-prev-card">
+      <div class="pp-deposit">Ksh 10,000</div>
+      <div class="pp-target">Target: <strong>Ksh 50,000</strong> · 12 days</div>
+      <div class="pp-return">+400% Total Return · ⭐ POPULAR</div>
+      <a href="index.html?tab=register" class="pp-btn">Start with Ksh 10,000 →</a>
+    </div>
+    <div class="plan-prev-card">
+      <div class="pp-deposit">Ksh 50,000</div>
+      <div class="pp-target">Target: <strong>Ksh 200,000</strong> · 14 days</div>
+      <div class="pp-return">+300% Total Return</div>
+      <a href="index.html?tab=register" class="pp-btn">Start with Ksh 50,000 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section">
+  <div class="section-title">⚡ How It <span>Works</span></div>
+  <div class="section-sub">Get started in under 2 minutes. No bank account required.</div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">STEP 01</div>
+      <div class="step-icon">👤</div>
+      <div class="step-title">Create Free Account</div>
+      <div class="step-desc">Sign up with your name, email and Safaricom number. Takes under 60 seconds.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 02</div>
+      <div class="step-icon">📱</div>
+      <div class="step-title">Deposit via M-PESA</div>
+      <div class="step-desc">Choose your plan and pay using M-PESA STK Push or manually to Till No. 3467367.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 03</div>
+      <div class="step-icon">📈</div>
+      <div class="step-title">Watch It Grow</div>
+      <div class="step-desc">Your balance grows at 28% every day. Monitor live in your dashboard.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 04</div>
+      <div class="step-icon">💸</div>
+      <div class="step-title">Withdraw to M-PESA</div>
+      <div class="step-desc">When your plan matures, withdraw your full balance directly to your M-PESA — instantly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="section">
+  <div class="section-title">🌟 What Investors <span>Say</span></div>
+  <div class="section-sub">Real results from real Kenyans.</div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="tc-top">
+        <div class="tc-avatar" style="background:#2a7a4f">AK</div>
+        <div><div class="tc-name">Amina Karimi</div><div class="tc-loc">Nairobi · Westlands</div></div>
+      </div>
+      <div class="tc-text">"Started with Ksh 2,000 and withdrew Ksh 15,000 in 10 days. I was skeptical at first but the M-PESA landed immediately!"</div>
+      <div class="tc-earned">✓ Earned Ksh 13,000 profit</div>
+    </div>
+    <div class="testi-card">
+      <div class="tc-top">
+        <div class="tc-avatar" style="background:#7a2a2a">JO</div>
+        <div><div class="tc-name">James Odhiambo</div><div class="tc-loc">Kisumu · Milimani</div></div>
+      </div>
+      <div class="tc-text">"The forex signals are genuinely useful — I use them alongside my investment plan here. Really good platform for Kenyans."</div>
+      <div class="tc-earned">✓ Earned Ksh 40,000 profit</div>
+    </div>
+    <div class="testi-card">
+      <div class="tc-top">
+        <div class="tc-avatar" style="background:#2a4a7a">FM</div>
+        <div><div class="tc-name">Faith Muthoni</div><div class="tc-loc">Mombasa · Nyali</div></div>
+      </div>
+      <div class="tc-text">"Love that everything is M-PESA — no complicated bank stuff. Referred my sister and we both earned bonuses!"</div>
+      <div class="tc-earned">✓ Earned Ksh 60,500 total</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <h2>Ready to Start<br><span>Earning Daily?</span></h2>
+  <p>Join over 14,800 Kenyans already growing their money with Razor Chart. Minimum deposit just Ksh 500 via M-PESA.</p>
+  <div class="hero-btns">
+    <a href="index.html?tab=register" class="btn-primary">Create Free Account →</a>
+    <a href="index.html?tab=login" class="btn-secondary">Already a member? Sign In</a>
+  </div>
+  <div class="cta-trust">
+    <div class="cta-trust-item">🔒 256-bit Encrypted</div>
+    <div class="cta-trust-item">📱 M-PESA Verified</div>
+    <div class="cta-trust-item">🇰🇪 Kenyan Law Compliant</div>
+    <div class="cta-trust-item">⚡ Instant Withdrawals</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-brand">Razor <span>Chart</span> Financial Group</div>
+  <div class="footer-links">
+    <a href="index.html?tab=register">Get Started</a>
+    <a href="index.html?tab=login">Sign In</a>
+    <a href="#signals">Forex Signals</a>
+    <a href="mailto:support@razorchart.co.ke">Support</a>
+  </div>
+  <div class="footer-note">
+    Risk Warning: Investment returns are not guaranteed. Past performance is not indicative of future results. Invest only what you can afford to lose. Razor Chart Financial Group · Westlands, Nairobi, Kenya · Governed by the laws of the Republic of Kenya.
+  </div>
+</footer>
+
+<script>
+// ── TICKER DATA ───────────────────────────────────────────────────
+const PAIRS = [
+  {pair:"EUR/USD",price:"1.0847",change:"+0.0023",up:true},
+  {pair:"GBP/USD",price:"1.2734",change:"+0.0041",up:true},
+  {pair:"USD/JPY",price:"154.82",change:"-0.34",up:false},
+  {pair:"GBP/JPY",price:"196.42",change:"-0.18",up:false},
+  {pair:"XAU/USD",price:"2,318.50",change:"+12.40",up:true},
+  {pair:"USD/KES",price:"129.45",change:"-0.22",up:false},
+  {pair:"AUD/USD",price:"0.6541",change:"+0.0018",up:true},
+  {pair:"USD/CHF",price:"0.8932",change:"-0.0011",up:false},
+  {pair:"EUR/GBP",price:"0.8520",change:"+0.0006",up:true},
+  {pair:"USD/CAD",price:"1.3621",change:"-0.0008",up:false},
+  {pair:"NZD/USD",price:"0.5988",change:"+0.0012",up:true},
+  {pair:"EUR/JPY",price:"167.93",change:"+0.14",up:true},
+];
+
+function buildTicker() {
+  const inner = document.getElementById("ticker-inner");
+  const items = [...PAIRS, ...PAIRS]; // duplicate for seamless loop
+  inner.innerHTML = items.map(p => `
+    <div class="ticker-item">
+      <span class="ticker-pair">${p.pair}</span>
+      <span class="ticker-price">${p.price}</span>
+      <span class="ticker-change ${p.up?'up':'dn'}">${p.change}</span>
+    </div>
+  `).join("");
+}
+
+// ── LIVE WITHDRAWAL FEED ──────────────────────────────────────────
+const FEED_DATA = [
+  {name:"Wanjiku M.", plan:"Ksh 10,000 Plan", amount:"Ksh 50,000", time:"2 min ago"},
+  {name:"Omondi J.",  plan:"Ksh 5,000 Plan",  amount:"Ksh 25,000", time:"8 min ago"},
+  {name:"Aisha K.",   plan:"Ksh 2,000 Plan",  amount:"Ksh 15,000", time:"15 min ago"},
+  {name:"Brian N.",   plan:"Ksh 20,000 Plan", amount:"Ksh 80,000", time:"22 min ago"},
+  {name:"Grace W.",   plan:"Ksh 1,000 Plan",  amount:"Ksh 5,000",  time:"31 min ago"},
+];
+
+function buildFeed() {
+  const feed = document.getElementById("lw-feed");
+  feed.innerHTML = FEED_DATA.map(f => `
+    <div class="lw-item">
+      <div>
+        <div class="lw-name">${f.name}</div>
+        <div class="lw-plan">${f.plan}</div>
+      </div>
+      <div class="lw-amount">${f.amount}</div>
+      <div class="lw-time">${f.time}</div>
+    </div>
+  `).join("");
+}
+
+// ── HANDLE ?tab= PASSTHROUGH ──────────────────────────────────────
+// Buttons already href to index.html?tab=register / index.html?tab=login
+// The index.html JS reads this param on load
+
+buildTicker();
+buildFeed();
+
+// Live-simulate tiny price changes on ticker every 4s
+setInterval(() => {
+  document.querySelectorAll(".ticker-price").forEach((el, i) => {
+    const base = parseFloat(PAIRS[i % PAIRS.length].price.replace(/,/g,""));
+    const drift = (Math.random() - 0.5) * 0.002 * base;
+    const newVal = (base + drift).toFixed(base > 100 ? 2 : 4);
+    el.textContent = newVal > 1000 ? Number(newVal).toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2}) : newVal;
+  });
+}, 4000);
+</script>
+</body>
+</html>
