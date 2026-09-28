@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Power Desk — Hill School Koimugul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1EA;
+    --ink:#1F2B27;
+    --ledger:#16332C;
+    --ledger-2:#274B41;
+    --gold:#B9812E;
+    --red:#9C3B3B;
+    --line:#CFD6C9;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
+  h1,h2,h3{font-family:'Zilla Slab',serif;font-weight:600;margin:0;}
+  .app{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+  nav{background:var(--ledger);color:#EDEAE0;padding:28px 20px;}
+  nav .brand{font-family:'Zilla Slab',serif;font-size:22px;margin-bottom:4px;}
+  nav .brand span{color:var(--gold);}
+  nav .school{font-size:12px;opacity:.7;margin-bottom:32px;}
+  nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#D8D9CF;font-family:'Inter';font-size:14px;padding:10px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08);}
+  nav button.active{color:#fff;font-weight:600;}
+  main{padding:36px 44px;max-width:980px;}
+  .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px;}
+  .stat-strip{display:flex;gap:28px;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .stat b{display:block;font-family:'Zilla Slab',serif;font-size:26px;}
+  .stat span{font-size:12px;color:#5B6B62;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th{text-align:left;font-weight:500;color:#5B6B62;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--ledger);}
+  td{padding:10px;border-bottom:1px solid var(--line);}
+  tr:hover td{background:#F7F8F3;}
+  .balance-owing{color:var(--red);font-weight:600;}
+  .balance-clear{color:var(--ledger-2);}
+  .btn{background:var(--gold);color:#fff;border:none;padding:8px 14px;border-radius:3px;font-size:13px;cursor:pointer;font-family:'Inter';font-weight:500;}
+  .btn:hover{background:#a36f27;}
+  .btn.secondary{background:transparent;border:1px solid var(--ledger);color:var(--ledger);}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:20px;margin-top:20px;}
+  .panel h3{font-size:16px;margin-bottom:14px;}
+  textarea,input,select{width:100%;font-family:'Inter';font-size:14px;padding:9px;border:1px solid var(--line);border-radius:3px;margin-bottom:10px;background:#fdfdfb;}
+  .msg-log{display:flex;flex-direction:column;gap:0;}
+  .msg-item{padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .msg-item .meta{color:#5B6B62;font-size:11px;margin-top:3px;}
+  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:2px;margin-right:6px;background:#EAEDE4;color:#4A564E;}
+  .tag.fee_reminder{background:#F3E4C7;color:#7A551E;}
+  .tag.receipt{background:#DCE9DF;color:#2C5A40;}
+  .tag.announcement{background:#E4E0ED;color:#4B3E6E;}
+  .empty{color:#8A968C;font-size:13px;padding:20px 0;}
+  .config-note{font-size:12px;background:#FBF3E1;border:1px solid #E9D6A8;padding:10px 14px;border-radius:3px;margin-bottom:24px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav>
+    <div class="brand">Power<span>Desk</span></div>
+    <div class="school">Hill School Koimugul</div>
+    <button class="active" data-view="fees">Fee Ledger</button>
+    <button data-view="messages">Parent Messages</button>
+  </nav>
+  <main>
+    <div id="config-warning" class="config-note" style="display:none;">
+      Firebase config not set — edit the <code>firebaseConfig</code> object at
+      the bottom of index.html with your project's keys.
+    </div>
+
+    <section id="view-fees">
+      <div class="row"><h1>Fee Ledger</h1><span id="fee-count"></span></div>
+      <div class="stat-strip">
+        <div class="stat"><b id="stat-owing">—</b><span>Learners owing</span></div>
+        <div class="stat"><b id="stat-total">—</b><span>Total outstanding (KES)</span></div>
+        <div class="stat"><b id="stat-unmatched">—</b><span>Unmatched payments</span></div>
+      </div>
+      <table>
+        <thead><tr><th>Learner</th><th>Class</th><th>Admission No.</th><th>Parent phone</th><th>Balance (KES)</th><th></th></tr></thead>
+        <tbody id="learners-body"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+      </table>
+    </section>
+
+    <section id="view-messages" style="display:none;">
+      <div class="row"><h1>Parent Messages</h1></div>
+
+      <div class="panel">
+        <h3>Send an announcement</h3>
+        <select id="ann-target">
+          <option value="all">Whole school</option>
+        </select>
+        <textarea id="ann-body" rows="3" placeholder="e.g. School closes at 1pm this Friday for a staff meeting."></textarea>
+        <button class="btn" id="ann-send">Queue message</button>
+      </div>
+
+      <div class="panel">
+        <h3>Message log</h3>
+        <div id="msg-log" class="msg-log"><div class="empty">Loading…</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+<script>
+  // TODO: replace with your project's Firebase config (Project settings -> your apps)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+  };
+  const SCHOOL_ID = "hill-school-koimugul"; // matches the schools/{schoolId} doc id
+
+  if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+    document.getElementById("config-warning").style.display = "block";
+  }
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const functions = firebase.functions();
+
+  // --- nav ---
+  document.querySelectorAll("nav button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("nav button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("view-fees").style.display = btn.dataset.view === "fees" ? "block" : "none";
+      document.getElementById("view-messages").style.display = btn.dataset.view === "messages" ? "block" : "none";
+    });
+  });
+
+  // --- fee ledger ---
+  function money(n){ return Number(n||0).toLocaleString("en-KE"); }
+
+  db.collection(`schools/${SCHOOL_ID}/learners`).orderBy("feeBalance", "desc")
+    .onSnapshot((snap) => {
+      const body = document.getElementById("learners-body");
+      if (snap.empty) { body.innerHTML = '<tr><td colspan="6" class="empty">No learners yet — add some to schools/' + SCHOOL_ID + '/learners in Firestore.</td></tr>'; return; }
+      let owing = 0, total = 0;
+      body.innerHTML = "";
+      snap.forEach((doc) => {
+        const l = doc.data();
+        if ((l.feeBalance||0) > 0) { owing++; total += l.feeBalance; }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${l.fullName||""}</td>
+          <td>${l.class||""}</td>
+          <td>${l.admissionNo||""}</td>
+          <td>${l.parentPhone||""}</td>
+          <td class="${l.feeBalance>0?'balance-owing':'balance-clear'}">${money(l.feeBalance)}</td>
+          <td>${l.feeBalance>0?`<button class="btn secondary" data-request="${doc.id}" data-phone="${l.parentPhone}" data-amount="${l.feeBalance}">Request payment</button>`:""}</td>`;
+        body.appendChild(tr);
+      });
+      document.getElementById("stat-owing").textContent = owing;
+      document.getElementById("stat-total").textContent = money(total);
+      document.getElementById("fee-count").textContent = snap.size + " learners";
+    }, (err) => {
+      document.getElementById("learners-body").innerHTML = `<tr><td colspan="6" class="empty">${err.message}</td></tr>`;
+    });
+
+  db.collection(`schools/${SCHOOL_ID}/payments`).where("matchStatus","==","unmatched").onSnapshot((snap) => {
+    document.getElementById("stat-unmatched").textContent = snap.size;
+  }, () => { document.getElementById("stat-unmatched").textContent = "—"; });
+
+  document.getElementById("learners-body").addEventListener("click", async (e) => {
+    const btn = e.target.closest("button[data-request]");
+    if (!btn) return;
+    btn.disabled = true; btn.textContent = "Sending prompt…";
+    try {
+      const requestFeePayment = functions.httpsCallable("requestFeePayment");
+      await requestFeePayment({
+        schoolId: SCHOOL_ID,
+        learnerId: btn.dataset.request,
+        phone: btn.dataset.phone,
+        amount: Number(btn.dataset.amount),
+      });
+      btn.textContent = "STK push sent";
+    } catch (err) {
+      btn.textContent = "Failed — retry";
+      btn.disabled = false;
+      console.error(err);
+    }
+  });
+
+  // --- parent messages ---
+  db.collection(`schools/${SCHOOL_ID}/messages`).orderBy("createdAt","desc").limit(50)
+    .onSnapshot((snap) => {
+      const log = document.getElementById("msg-log");
+      if (snap.empty) { log.innerHTML = '<div class="empty">No messages sent yet.</div>'; return; }
+      log.innerHTML = "";
+      snap.forEach((doc) => {
+        const m = doc.data();
+        const time = m.createdAt?.toDate ? m.createdAt.toDate().toLocaleString("en-KE") : "";
+        const div = document.createElement("div");
+        div.className = "msg-item";
+        div.innerHTML = `<span class="tag ${m.category}">${(m.category||"").replace("_"," ")}</span>${m.body||""}
+          <div class="meta">${m.phone||""} · ${m.status||""} · ${time}</div>`;
+        log.appendChild(div);
+      });
+    }, (err) => {
+      document.getElementById("msg-log").innerHTML = `<div class="empty">${err.message}</div>`;
+    });
+
+  document.getElementById("ann-send").addEventListener("click", async () => {
+    const body = document.getElementById("ann-body").value.trim();
+    if (!body) return;
+    const learners = await db.collection(`schools/${SCHOOL_ID}/learners`).get();
+    const batch = db.batch();
+    learners.forEach((doc) => {
+      const l = doc.data();
+      if (!l.parentPhone) return;
+      const ref = db.collection(`schools/${SCHOOL_ID}/messages`).doc();
+      batch.set(ref, {
+        category: "announcement",
+        learnerId: doc.id,
+        phone: l.parentPhone,
+        body,
+        status: "queued",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+    await batch.commit();
+    document.getElementById("ann-body").value = "";
+  });
+</script>
+</body>
+</html>
