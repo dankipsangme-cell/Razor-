@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#050608"/>
+<meta name="description" content="Razor Chart — Smart investment platform. Select your country and start growing your money today."/>
+<title>Razor Chart · Welcome</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#D4A017;--gold-l:#F5C842;--gold-d:#8a6510;
+  --black:#050608;--dark:#0d0f14;--card:#111420;--card2:#161924;
+  --border:rgba(212,160,23,.18);--border2:rgba(255,255,255,.06);
+  --text:#e8e4d8;--muted:#6b7180;--muted2:#4a4f60;
+  --green:#1FD67A;--red:#F04E4E;--blue:#4A9EFF;
+  --r:14px;--r2:20px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 70% -10%,rgba(212,160,23,.1) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 10% 110%,rgba(212,160,23,.06) 0%,transparent 60%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.025) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ══ COUNTRY PICKER OVERLAY ═══════════════════════════════════════ */
+.cp-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:16px;background:rgba(5,6,8,.98);backdrop-filter:blur(20px);overflow-y:auto}
+.cp-box{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:28px 22px;max-width:540px;width:100%;position:relative;overflow:visible;animation:fadeUp .5s ease;display:flex;flex-direction:column;margin:auto}
+.cp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-l),var(--gold),transparent);animation:shimmer 3s infinite}
+.cp-gem{width:52px;height:52px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 32px rgba(212,160,23,.4)}
+.cp-gem svg{width:24px;height:24px;fill:#000}
+.cp-title{text-align:center;font-size:1.4rem;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.cp-sub{text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.cp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px}
+.cp-country{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;cursor:pointer;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.cp-country:hover{border-color:rgba(212,160,23,.3);background:rgba(212,160,23,.06)}
+.cp-country.selected{border-color:var(--gold);background:rgba(212,160,23,.1)}
+.cp-flag{font-size:1.4rem;flex-shrink:0}
+.cp-info{}
+.cp-name{font-size:.85rem;font-weight:700}
+.cp-currency{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:1px}
+.cp-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));color:#000;font-weight:800;font-size:1rem;font-family:'Syne',sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 28px rgba(212,160,23,.3)}
+.cp-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(212,160,23,.45)}
+.cp-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ══ NAV ══════════════════════════════════════════════════════════ */
+.nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(5,6,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
+.nav-logo-gem{width:32px;height:32px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center}
+.nav-logo-gem svg{width:16px;height:16px;fill:#000}
+.nav-logo span{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-country{display:flex;align-items:center;gap:6px;font-size:.75rem;font-family:'Space Mono',monospace;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all .15s}
+.nav-country:hover{border-color:var(--border);color:var(--text)}
+.nav-live{font-size:.7rem;font-family:'Space Mono',monospace;color:var(--green);display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:rgba(31,214,122,.08);border:1px solid rgba(31,214,122,.2)}
+.nav-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite}
+.nav-signin{padding:9px 20px;background:transparent;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-weight:700;font-size:.82rem;font-family:'Syne',sans-serif;cursor:pointer;text-decoration:none;transition:all .15s}
+.nav-signin:hover{border-color:var(--gold);color:var(--gold)}
+.nav-cta{padding:9px 20px;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.82rem;font-family:'Syne',sans-serif;border:none;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:transform .15s,box-shadow .15s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,160,23,.3)}
+
+/* ══ TICKER ══════════════════════════════════════════════════════ */
+.ticker-wrap{background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);overflow:hidden;height:34px;display:flex;align-items:center}
+.ticker-track{display:flex;animation:tickerScroll 35s linear infinite;white-space:nowrap}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 24px;font-family:'Space Mono',monospace;font-size:.68rem;border-right:1px solid var(--border2)}
+.t-pair{color:var(--muted);font-weight:700}.t-price{color:var(--text);font-weight:700}
+.t-chg.up{color:var(--green)}.t-chg.dn{color:var(--red)}
+
+/* ══ SECTION UTIL ════════════════════════════════════════════════ */
+.section{position:relative;z-index:1;padding:0 20px 64px;max-width:1000px;margin:0 auto}
+.section-hdr{text-align:center;margin-bottom:40px}
+.section-hdr h2{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.3px;margin-bottom:10px}
+.section-hdr h2 span{color:var(--gold)}
+.section-hdr p{font-size:.92rem;color:var(--muted);line-height:1.75;max-width:520px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:5px 14px;font-size:.65rem;font-family:'Space Mono',monospace;color:var(--gold);letter-spacing:.5px;margin-bottom:14px}
+
+/* ══ HERO ════════════════════════════════════════════════════════ */
+.hero{position:relative;z-index:1;text-align:center;padding:72px 20px 56px}
+.hero-gem{width:64px;height:64px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 48px rgba(212,160,23,.5);animation:float 4s ease-in-out infinite}
+.hero-gem svg{width:30px;height:30px;fill:#000}
+.hero h1{font-size:clamp(2.2rem,6vw,3.8rem);font-weight:800;line-height:1.08;letter-spacing:-.5px;margin-bottom:18px;max-width:800px;margin-left:auto;margin-right:auto}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero-sub{font-size:1.05rem;color:var(--muted);line-height:1.75;max-width:560px;margin:0 auto 32px}
+.hero-amount{font-size:1.4rem;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace;display:block;margin-bottom:24px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{padding:16px 36px;background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));color:#000;font-weight:800;font-size:1rem;font-family:'Syne',sans-serif;border:none;border-radius:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 28px rgba(212,160,23,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(212,160,23,.45)}
+.btn-outline{padding:16px 32px;background:transparent;color:var(--text);font-weight:700;font-size:1rem;font-family:'Syne',sans-serif;border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .15s}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.hero-stats{display:flex;gap:0;justify-content:center;margin-top:52px;background:rgba(255,255,255,.025);border:1px solid var(--border2);border-radius:20px;overflow:hidden;max-width:560px;margin-left:auto;margin-right:auto}
+.hero-stat{flex:1;padding:20px 16px;text-align:center;border-right:1px solid var(--border2)}
+.hero-stat:last-child{border-right:none}
+.hs-val{font-size:1.6rem;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace;letter-spacing:-1px}
+.hs-lbl{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px;margin-top:3px}
+
+/* ══ HOW IT WORKS ════════════════════════════════════════════════ */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.step-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:26px;position:relative;transition:border-color .2s}
+.step-card:hover{border-color:var(--border)}
+.step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:#000;margin-bottom:16px}
+.step-icon{font-size:1.6rem;margin-bottom:12px}
+.step-card h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
+.step-card p{font-size:.8rem;color:var(--muted);line-height:1.7}
+
+/* ══ PLANS ═══════════════════════════════════════════════════════ */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.plan-card{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--r2);padding:22px;text-align:center;position:relative;transition:all .2s;cursor:default}
+.plan-card:hover{border-color:var(--border);transform:translateY(-3px)}
+.plan-card.popular{border-color:rgba(212,160,23,.4);background:rgba(212,160,23,.04)}
+.plan-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-size:.6rem;font-weight:800;padding:3px 12px;border-radius:20px;font-family:'Space Mono',monospace;white-space:nowrap}
+.plan-deposit{font-size:1.4rem;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace;margin-bottom:4px}
+.plan-target{font-size:.78rem;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:12px}
+.plan-detail{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.8}
+.plan-days{display:inline-block;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:6px;padding:3px 10px;font-size:.62rem;font-family:'Space Mono',monospace;color:var(--gold);margin-top:10px}
+
+/* ══ SIGNALS PREVIEW ═════════════════════════════════════════════ */
+.signals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sig-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:18px;position:relative;overflow:hidden;transition:border-color .2s}
+.sig-card:hover{border-color:var(--border)}
+.sig-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sig-card.buy::before{background:linear-gradient(90deg,var(--green),rgba(31,214,122,.2))}
+.sig-card.sell::before{background:linear-gradient(90deg,var(--red),rgba(240,78,78,.2))}
+.sig-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sig-pair{font-size:1.05rem;font-weight:800}
+.sig-type{font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:6px;font-family:'Space Mono',monospace}
+.sig-type.buy{background:rgba(31,214,122,.1);color:var(--green);border:1px solid rgba(31,214,122,.2)}
+.sig-type.sell{background:rgba(240,78,78,.08);color:var(--red);border:1px solid rgba(240,78,78,.15)}
+.sig-prices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sig-price-cell{background:var(--card2);border-radius:8px;padding:8px;text-align:center}
+.sig-price-label{font-size:.55rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:3px}
+.sig-price-val{font-size:.78rem;font-weight:700;font-family:'Space Mono',monospace}
+.sig-price-val.entry{color:var(--text)}.sig-price-val.tp{color:var(--green)}.sig-price-val.sl{color:var(--red)}
+.sig-analysis{font-size:.72rem;color:var(--muted);line-height:1.6;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;border-left:2px solid var(--border)}
+.sig-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.sig-tf{font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted);background:var(--card2);padding:3px 8px;border-radius:5px}
+.sig-time{font-size:.62rem;color:var(--muted2);font-family:'Space Mono',monospace}
+
+/* ══ TESTIMONIALS ════════════════════════════════════════════════ */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.testi-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:18px;transition:border-color .2s}
+.testi-card:hover{border-color:var(--border)}
+.testi-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.testi-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#fff;flex-shrink:0}
+.testi-name{font-size:.85rem;font-weight:700}
+.testi-loc{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px}
+.testi-quote{font-size:.78rem;color:var(--muted);line-height:1.7;font-style:italic;margin-bottom:12px}
+.testi-bottom{display:flex;align-items:center;justify-content:space-between}
+.testi-amount{font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;color:var(--green)}
+.testi-verified{font-size:.58rem;font-family:'Space Mono',monospace;color:var(--green);display:flex;align-items:center;gap:3px}
+
+/* ══ RULES & POLICIES ════════════════════════════════════════════ */
+.rules-wrap{display:grid;gap:12px}
+.rule-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:20px 22px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s}
+.rule-card:hover{border-color:var(--border)}
+.rule-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.rule-body h3{font-size:.92rem;font-weight:700;margin-bottom:6px}
+.rule-body p{font-size:.78rem;color:var(--muted);line-height:1.7}
+.rule-card.warn{border-color:rgba(240,78,78,.2);background:rgba(240,78,78,.04)}
+.rule-card.warn h3{color:var(--red)}
+.rule-card.info{border-color:rgba(74,158,255,.2);background:rgba(74,158,255,.04)}
+.rule-card.info h3{color:var(--blue)}
+
+/* ══ FAQ ═════════════════════════════════════════════════════════ */
+.faq-list{display:flex;flex-direction:column;gap:8px}
+.faq-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;font-size:.9rem;font-weight:700;-webkit-tap-highlight-color:transparent;transition:color .15s}
+.faq-q:hover{color:var(--gold)}
+.faq-q .faq-arrow{font-size:.7rem;color:var(--muted);transition:transform .2s}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 20px 16px;font-size:.82rem;color:var(--muted);line-height:1.75}
+.faq-item.open .faq-a{display:block}
+
+/* ══ RISK DISCLAIMER ═════════════════════════════════════════════ */
+.risk-box{background:rgba(240,78,78,.04);border:1px solid rgba(240,78,78,.2);border-radius:var(--r2);padding:24px;margin-bottom:24px}
+.risk-box h3{color:var(--red);font-size:.95rem;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.risk-box p{font-size:.78rem;color:var(--muted);line-height:1.75}
+
+/* ══ CTA BANNER ══════════════════════════════════════════════════ */
+.cta-banner{background:linear-gradient(135deg,rgba(212,160,23,.12),rgba(212,160,23,.04));border:1px solid rgba(212,160,23,.25);border-radius:var(--r2);padding:48px 32px;text-align:center;position:relative;overflow:hidden}
+.cta-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:shimmer 3s infinite}
+.cta-banner h2{font-size:1.8rem;font-weight:800;margin-bottom:10px}
+.cta-banner p{color:var(--muted);font-size:.92rem;margin-bottom:28px;line-height:1.7}
+
+/* ══ FOOTER ══════════════════════════════════════════════════════ */
+footer{border-top:1px solid var(--border2);padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace;position:relative;z-index:1}
+.footer-links{display:flex;gap:20px}
+.footer-links a{color:var(--muted);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--gold)}
+.footer-disc{font-size:.62rem;color:var(--muted2);text-align:center;padding:12px 24px;line-height:1.6;position:relative;z-index:1}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════ */
+@media(max-width:640px){
+  .nav{padding:12px 16px}
+  .hero{padding:48px 16px 40px}
+  .section{padding:0 14px 48px}
+  .hero-stats{max-width:100%}
+  .hero-btns{flex-direction:column;align-items:center}
+  .cp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ COUNTRY PICKER OVERLAY ══════════════════════════════════════ -->
+<div class="cp-overlay" id="cp-overlay">
+  <div class="cp-box">
+    <div class="cp-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+    <div class="cp-title">Welcome to RazorChart</div>
+    <p class="cp-sub">Select your country to personalise your investment experience — plans, currency, and success stories will reflect your location.</p>
+    <div class="cp-grid" id="cp-grid">
+      <!-- Injected by JS -->
+    </div>
+    <button class="cp-btn" id="cp-continue" onclick="confirmCountry()" disabled>
+      Continue →
+    </button>
+  </div>
+</div>
+
+<!-- ══ MAIN PORTAL ══════════════════════════════════════════════════ -->
+<div id="portal-body" style="display:none">
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="portal.html">
+    <div class="nav-logo-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+    <div><span>Razor</span>Chart</div>
+  </a>
+  <div class="nav-right">
+    <button class="nav-country" onclick="changeCountry()" id="nav-country-btn">🇰🇪 Kenya</button>
+    <div class="nav-live">LIVE SIGNALS</div>
+    <a class="nav-signin" href="index.html">Sign In</a>
+    <a class="nav-cta" href="index.html#register">Get Started →</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker-track" id="ticker-track"></div></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">📡 Real-Time Intelligence · East Africa's #1 Investment Platform</div>
+  <div class="hero-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+  <h1>Grow Your Money at<br><em>28% Daily Returns</em></h1>
+  <p class="hero-sub">Select an investment plan, pay securely via Paystack, and watch your portfolio grow every single day. Live forex signals included free.</p>
+  <span class="hero-amount" id="hero-min-amount">Start from Ksh 500</span>
+  <div class="hero-btns">
+    <a class="btn-primary" href="index.html">🚀 Create Free Account</a>
+    <a class="btn-outline" href="#how-it-works">How It Works ↓</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hs-val" id="stat-paid">Ksh 4.8M+</div><div class="hs-lbl">PAID OUT</div></div>
+    <div class="hero-stat"><div class="hs-val">28%</div><div class="hs-lbl">DAILY GROWTH</div></div>
+    <div class="hero-stat"><div class="hs-val">10</div><div class="hs-lbl">COUNTRIES</div></div>
+    <div class="hero-stat"><div class="hs-val" id="stat-members">12,400+</div><div class="hs-lbl">MEMBERS</div></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how-it-works">
+  <div class="section-hdr">
+    <div class="eyebrow">⚡ Simple 3-Step Process</div>
+    <h2>How <span>It Works</span></h2>
+    <p>From sign-up to growing portfolio in under 5 minutes.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-icon">👤</div>
+      <h3>Create Your Free Account</h3>
+      <p>Sign up with your email and password. No documents required. Your account is live in 30 seconds.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-icon">💳</div>
+      <h3>Choose a Plan & Pay via Paystack</h3>
+      <p>Select your investment plan and pay securely using M-PESA STK push, card, or bank transfer via Paystack. Instant activation.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-icon">📈</div>
+      <h3>Watch Your Balance Grow Daily</h3>
+      <p>Your balance grows at 28% per day. Track progress on your live portfolio dashboard. Withdraw when you hit your target.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-icon">💸</div>
+      <h3>Withdraw Your Profits</h3>
+      <p>Once your plan reaches its target balance, withdraw directly to M-PESA or your bank. Processing within 24 hours.</p>
+    </div>
+  </div>
+</div>
+
+<!-- INVESTMENT PLANS -->
+<div class="section">
+  <div class="section-hdr">
+    <div class="eyebrow">💰 All Plans · 28% Daily Growth</div>
+    <h2>Investment <span>Plans</span></h2>
+    <p id="plans-sub">Choose a plan that fits your budget. All plans grow at 28% per day.</p>
+  </div>
+  <div class="plans-grid" id="plans-grid"><!-- JS --></div>
+</div>
+
+<!-- LIVE SIGNALS -->
+<div class="section">
+  <div class="section-hdr">
+    <div class="eyebrow">📡 Updated Every 15 Minutes</div>
+    <h2>Live Forex <span>Signals</span></h2>
+    <p>Entry, take profit and stop loss for 20+ currency pairs. Included free with your account.</p>
+  </div>
+  <div class="signals-grid">
+    <div class="sig-card buy">
+      <div class="sig-top"><span class="sig-pair">EUR/USD</span><span class="sig-type buy">BUY</span></div>
+      <div class="sig-prices">
+        <div class="sig-price-cell"><div class="sig-price-label">ENTRY</div><div class="sig-price-val entry">1.0842</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">TAKE PROFIT</div><div class="sig-price-val tp">1.0890</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">STOP LOSS</div><div class="sig-price-val sl">1.0815</div></div>
+      </div>
+      <div class="sig-analysis">RSI showing bullish divergence. Price bounced off key support at 1.0820. Momentum building upward.</div>
+      <div class="sig-footer"><span class="sig-tf">H4</span><span class="sig-time">Updated 14 min ago</span></div>
+    </div>
+    <div class="sig-card sell">
+      <div class="sig-top"><span class="sig-pair">GBP/USD</span><span class="sig-type sell">SELL</span></div>
+      <div class="sig-prices">
+        <div class="sig-price-cell"><div class="sig-price-label">ENTRY</div><div class="sig-price-val entry">1.2634</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">TAKE PROFIT</div><div class="sig-price-val tp">1.2580</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">STOP LOSS</div><div class="sig-price-val sl">1.2670</div></div>
+      </div>
+      <div class="sig-analysis">Bearish engulfing at key resistance. Dollar strength expected ahead of US data release today.</div>
+      <div class="sig-footer"><span class="sig-tf">H1</span><span class="sig-time">Updated 8 min ago</span></div>
+    </div>
+    <div class="sig-card buy">
+      <div class="sig-top"><span class="sig-pair">XAU/USD</span><span class="sig-type buy">BUY</span></div>
+      <div class="sig-prices">
+        <div class="sig-price-cell"><div class="sig-price-label">ENTRY</div><div class="sig-price-val entry">2318.50</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">TAKE PROFIT</div><div class="sig-price-val tp">2345.00</div></div>
+        <div class="sig-price-cell"><div class="sig-price-label">STOP LOSS</div><div class="sig-price-val sl">2302.00</div></div>
+      </div>
+      <div class="sig-analysis">Gold forming higher lows. Safe-haven demand elevated. Strong break above 2310 confirms bullish continuation.</div>
+      <div class="sig-footer"><span class="sig-tf">H4</span><span class="sig-time">Updated 2 min ago</span></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px">
+    <a class="btn-outline" href="index.html">View All Signals After Sign-In →</a>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="section">
+  <div class="section-hdr">
+    <div class="eyebrow" id="testi-eyebrow">🇰🇪 Kenya · Investor Wins</div>
+    <h2>Real <span>Success Stories</span></h2>
+    <p>Verified results from active investors across 10 countries.</p>
+  </div>
+  <div class="testi-grid" id="testi-grid"><!-- JS --></div>
+</div>
+
+<!-- RULES & POLICIES -->
+<div class="section" id="rules">
+  <div class="section-hdr">
+    <div class="eyebrow">📋 Read Before Investing</div>
+    <h2>Rules &amp; <span>Policies</span></h2>
+    <p>Transparency is everything. Read these fully before creating your account.</p>
+  </div>
+
+  <div class="risk-box">
+    <h3>⚠ Risk Disclosure — Read This First</h3>
+    <p>All investment plans on Razor Chart are <strong>educational simulation plans</strong>. Returns shown (28% daily) represent growth within the platform's simulation engine and are not guaranteed in any financial sense. Do not invest money you cannot afford to lose. Past simulated performance is not indicative of future results. By creating an account you confirm that you understand this is a financial education platform.</p>
+  </div>
+
+  <div class="rules-wrap">
+    <div class="rule-card">
+      <div class="rule-icon">💳</div>
+      <div class="rule-body">
+        <h3>Deposit Rules</h3>
+        <p>All deposits must be made via Paystack (M-PESA, card, or bank transfer). Each deposit activates one investment plan. Minimum deposit varies by country. Only one active plan per deposit. Deposits are non-refundable once an investment plan is activated.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">📈</div>
+      <div class="rule-body">
+        <h3>Growth & Returns</h3>
+        <p>Investment plans grow at 28% daily on the deposited principal. Growth is credited daily and reflected on your portfolio dashboard. Plans run for a fixed number of days (7–14 depending on plan). Growth is simulated and shown for educational purposes.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">💸</div>
+      <div class="rule-body">
+        <h3>Withdrawals</h3>
+        <p>Withdrawals are only available once a plan reaches its target balance. Withdrawal requests are reviewed within 24 hours. Payments are processed via M-PESA to your registered number. Early withdrawals before target are not permitted. Maximum one withdrawal per completed plan.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">🤝</div>
+      <div class="rule-body">
+        <h3>Referral Programme</h3>
+        <p>You earn Ksh 100 (or local equivalent) for every friend you refer who makes their first investment. After 5 qualifying referrals, a Ksh 500 bonus unlocks for withdrawal. Self-referral and multi-account creation are strictly prohibited and result in permanent account termination.</p>
+      </div>
+    </div>
+    <div class="rule-card info">
+      <div class="rule-icon">🔒</div>
+      <div class="rule-body">
+        <h3>Account Security</h3>
+        <p>Your account is secured with Firebase Authentication and email verification. We will never ask for your password. Enable email verification immediately after registration. You are responsible for keeping your login credentials secure. Report suspicious activity immediately.</p>
+      </div>
+    </div>
+    <div class="rule-card info">
+      <div class="rule-icon">🌍</div>
+      <div class="rule-body">
+        <h3>Eligibility & Jurisdiction</h3>
+        <p>You must be 18 years or older to create an account. The platform is available in Kenya, Uganda, Tanzania, Zambia, South Africa, USA, UK, Australia, Ghana and Nigeria. Users are responsible for ensuring compliance with local laws regarding online investment platforms in their jurisdiction.</p>
+      </div>
+    </div>
+    <div class="rule-card warn">
+      <div class="rule-icon">🚫</div>
+      <div class="rule-body">
+        <h3>Prohibited Activities</h3>
+        <p>The following are strictly prohibited and result in immediate account termination and forfeiture of all balances: creating multiple accounts, submitting fraudulent payment references, attempting to manipulate the referral system, using another person's payment details without consent, or any activity that violates applicable law.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">📞</div>
+      <div class="rule-body">
+        <h3>Dispute Resolution</h3>
+        <p>All disputes must be raised via the in-app RazorBot chat or email within 7 days of the transaction in question. Razor Chart reserves the right to request payment verification evidence before processing any dispute. Decisions by Razor Chart management are final.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="section-hdr">
+    <div class="eyebrow">❓ Common Questions</div>
+    <h2>Frequently Asked <span>Questions</span></h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">How quickly does my investment activate after payment? <span class="faq-arrow">▼</span></div><div class="faq-a">Your investment activates instantly once Paystack confirms your payment. The Paystack reference is automatically verified and your portfolio updates within seconds.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Can I invest from outside Kenya? <span class="faq-arrow">▼</span></div><div class="faq-a">Yes. Razor Chart is available in Kenya, Uganda, Tanzania, Zambia, South Africa, USA, UK, Australia, Ghana and Nigeria. Plans are shown in your local currency equivalent. Paystack supports payments from all these countries.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What happens if I miss the withdrawal window? <span class="faq-arrow">▼</span></div><div class="faq-a">Your completed plan balance stays safely in your account until you request withdrawal. There is no expiry on completed plans. You can withdraw at any time after the target is reached.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">How does the referral programme work exactly? <span class="faq-arrow">▼</span></div><div class="faq-a">Share your unique referral code from your Account tab. When a friend signs up using your code and makes their first investment, you earn Ksh 100 (or local equivalent). Once 5 friends have invested, your total Ksh 500 bonus unlocks for withdrawal.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Is my payment information stored securely? <span class="faq-arrow">▼</span></div><div class="faq-a">Razor Chart does not store any card details. All payments are processed by Paystack, which is PCI-DSS compliant. We only store your Paystack transaction reference as proof of payment. Your financial data never touches our servers directly.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What are the live forex signals? <span class="faq-arrow">▼</span></div><div class="faq-a">Forex signals are analyst-generated trade recommendations for currency pairs like EUR/USD, GBP/USD, XAU/USD and more. Each signal includes an entry price, take profit target and stop loss level. They are for educational and informational purposes only and do not constitute financial advice.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Can I have multiple active investment plans? <span class="faq-arrow">▼</span></div><div class="faq-a">Yes. You can activate multiple plans simultaneously by making separate deposits. Each plan tracks independently on your portfolio dashboard with its own progress bar, target balance and projected completion date.</div></div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="section">
+  <div class="cta-banner">
+    <h2>Ready to Start Growing?</h2>
+    <p id="cta-sub">Create your free account in 30 seconds. Start from as little as Ksh 500.<br>No hidden fees. No monthly charges. Cancel anytime.</p>
+    <a class="btn-primary" href="index.html" style="font-size:1.05rem;padding:18px 40px">🚀 Create Free Account — It's Free</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-weight:700">Razor<span style="color:var(--gold)">Chart</span> Financial Group</div>
+  <div class="footer-links">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#rules">Rules</a>
+    <a href="index.html">Sign In</a>
+    <a href="index.html">Create Account</a>
+  </div>
+  <div>© 2025 Razor Chart · East Africa</div>
+</footer>
+<div class="footer-disc">⚠ <strong>Risk Disclaimer:</strong> Razor Chart is a financial education platform. All returns are simulated. Past performance is not indicative of future results. Do not invest money you cannot afford to lose. Trade responsibly.</div>
+
+</div><!-- end portal-body -->
+
+<script>
+// ══ RAZOR CHART PORTAL — FULL ENGINE ════════════════════════════
+const COUNTRIES = [
+  { code:"KE", flag:"🇰🇪", name:"Kenya",        currency:"KES", symbol:"Ksh",  rate:1,      tz:"Africa/Nairobi"        },
+  { code:"UG", flag:"🇺🇬", name:"Uganda",       currency:"UGX", symbol:"UGX",  rate:36,     tz:"Africa/Kampala"        },
+  { code:"TZ", flag:"🇹🇿", name:"Tanzania",     currency:"TZS", symbol:"TSh",  rate:26,     tz:"Africa/Dar_es_Salaam"  },
+  { code:"ZM", flag:"🇿🇲", name:"Zambia",       currency:"ZMW", symbol:"ZMW",  rate:0.11,   tz:"Africa/Lusaka"         },
+  { code:"ZA", flag:"🇿🇦", name:"South Africa", currency:"ZAR", symbol:"R",    rate:0.074,  tz:"Africa/Johannesburg"   },
+  { code:"US", flag:"🇺🇸", name:"United States",currency:"USD", symbol:"$",    rate:0.0077, tz:"America/New_York"      },
+  { code:"GB", flag:"🇬🇧", name:"United Kingdom",currency:"GBP",symbol:"£",    rate:0.006,  tz:"Europe/London"         },
+  { code:"AU", flag:"🇦🇺", name:"Australia",    currency:"AUD", symbol:"A$",   rate:0.012,  tz:"Australia/Sydney"      },
+  { code:"GH", flag:"🇬🇭", name:"Ghana",        currency:"GHS", symbol:"GH₵",  rate:0.092,  tz:"Africa/Accra"          },
+  { code:"NG", flag:"🇳🇬", name:"Nigeria",      currency:"NGN", symbol:"₦",    rate:5.9,    tz:"Africa/Lagos"          },
+];
+
+// KES base plans
+const BASE_PLANS = [
+  { deposit:500,   target:3500,   days:7  },
+  { deposit:1000,  target:5000,   days:7  },
+  { deposit:2000,  target:15000,  days:10 },
+  { deposit:5000,  target:25000,  days:10, popular:true },
+  { deposit:10000, target:50000,  days:12 },
+  { deposit:20000, target:80000,  days:12 },
+  { deposit:50000, target:200000, days:14 },
+  { deposit:100000,target:400000, days:14 },
+];
+
+const TESTIMONIALS = {
+  KE:[
+    { initials:"JK", name:"James Kamau",    city:"Nairobi",       quote:"Deposited on Monday, payout landed Friday. Razor Chart is the real deal.", amount:"Ksh 25,000", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"AA", name:"Adhiambo Auma",  city:"Kisumu",        quote:"My balance grows every single day. Referred 3 friends — we all profit together!", amount:"Ksh 50,000", g1:"#1a2a3a", g2:"#4A9EFF" },
+    { initials:"CK", name:"Chebet Koech",   city:"Eldoret",       quote:"Live signals and real charts — feels like a Bloomberg terminal in my pocket.", amount:"Ksh 15,000", g1:"#3a1a1a", g2:"#D4A017" },
+  ],
+  UG:[
+    { initials:"DM", name:"David Mugisha",  city:"Kampala",       quote:"I was skeptical at first but my UGX tripled in 12 days. Now I tell everyone.", amount:"UGX 900,000", g1:"#2a1a3a", g2:"#9B59B6" },
+    { initials:"AK", name:"Amina Kiwanuka", city:"Entebbe",       quote:"Forex signals helped me understand the market while my investment grew daily.", amount:"UGX 450,000", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"RO", name:"Robert Okello",  city:"Gulu",          quote:"Simple to use. Paystack made depositing seamless. Profits are real and consistent.", amount:"UGX 1,200,000", g1:"#3a2a1a", g2:"#D4A017" },
+  ],
+  TZ:[
+    { initials:"FM", name:"Fatuma Mwalimu", city:"Dar es Salaam", quote:"Nilianza na kidogo sana. Sasa ninalipa karo ya watoto wangu na faida yangu.", amount:"TSh 280,000", g1:"#1a2a3a", g2:"#00B4D8" },
+    { initials:"JN", name:"Joseph Nkembo",  city:"Arusha",        quote:"The investment dashboard is clean and professional. My trust grew very fast.", amount:"TSh 650,000", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"GM", name:"Grace Mwangi",   city:"Mwanza",        quote:"Referred my cousin in Nairobi. We both profit every day. Highly recommend!", amount:"TSh 1,100,000", g1:"#3a1a2a", g2:"#FF6B9D" },
+  ],
+  ZM:[
+    { initials:"CM", name:"Chanda Mumba",   city:"Lusaka",        quote:"Started with ZMW 500. Target hit in 10 days. Withdrew straight to mobile money.", amount:"ZMW 3,500", g1:"#1a3a1a", g2:"#2ECC71" },
+    { initials:"MP", name:"Mutinta Phiri",  city:"Kitwe",         quote:"The referral programme is brilliant. My team of 5 all investing together!", amount:"ZMW 8,000", g1:"#2a1a3a", g2:"#9B59B6" },
+    { initials:"BL", name:"Bwalya Lungu",   city:"Ndola",         quote:"Forex signals are accurate and the portfolio charts are very easy to read.", amount:"ZMW 12,500", g1:"#1a2a3a", g2:"#4A9EFF" },
+  ],
+  ZA:[
+    { initials:"TN", name:"Thabo Nkosi",    city:"Johannesburg",  quote:"Never thought passive income could be this simple. R900 became R6K in 10 days.", amount:"R 6,300", g1:"#3a1a1a", g2:"#E74C3C" },
+    { initials:"LB", name:"Lerato Botha",   city:"Cape Town",     quote:"The premium design builds trust immediately. Signals are accurate and timely.", amount:"R 14,000", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"SM", name:"Sipho Molefe",   city:"Durban",        quote:"Invested during lunch break. By Friday the balance had grown significantly.", amount:"R 31,500", g1:"#1a2a3a", g2:"#3498DB" },
+  ],
+  US:[
+    { initials:"MJ", name:"Marcus Johnson",  city:"Atlanta, GA",  quote:"Clean UI, solid returns. RazorBot answered every question I had instantly.", amount:"$420", g1:"#1a2a3a", g2:"#4A9EFF" },
+    { initials:"SK", name:"Sarah Kim",       city:"Houston, TX",  quote:"The forex signals gave me context for my investments. Everything is transparent.", amount:"$780", g1:"#3a1a2a", g2:"#E91E63" },
+    { initials:"DO", name:"David Okonkwo",   city:"New York, NY", quote:"As a Nigerian-American I love seeing a platform built for the African market.", amount:"$215", g1:"#2a3a1a", g2:"#8BC34A" },
+  ],
+  GB:[
+    { initials:"AO", name:"Amara Osei",     city:"London",        quote:"Sent money from London to invest. Withdrew profits to my family's M-PESA in Kenya.", amount:"£320", g1:"#1a2a3a", g2:"#2196F3" },
+    { initials:"JM", name:"James Mutua",    city:"Manchester",    quote:"Razor Chart gives me exposure to East African growth from the UK. Brilliant.", amount:"£580", g1:"#3a1a1a", g2:"#D4A017" },
+    { initials:"FN", name:"Florence Nyong", city:"Birmingham",    quote:"The live crypto and forex feed keeps me updated even while I'm at work.", amount:"£145", g1:"#1a3a2a", g2:"#1FD67A" },
+  ],
+  AU:[
+    { initials:"KA", name:"Kofi Asante",    city:"Sydney",        quote:"Found Razor Chart through a friend in Ghana. Best financial decision I've made.", amount:"A$950", g1:"#1a2a3a", g2:"#00BCD4" },
+    { initials:"PN", name:"Patricia Nwachukwu", city:"Melbourne", quote:"Platform is polished and professional. The chatbot is surprisingly helpful!", amount:"A$1,100", g1:"#3a1a2a", g2:"#FF5722" },
+    { initials:"EM", name:"Emmanuel Mwenda", city:"Perth",        quote:"Transferred AUD, balance grew consistently every day. Referral bonus was great.", amount:"A$430", g1:"#2a3a1a", g2:"#4CAF50" },
+  ],
+  GH:[
+    { initials:"KO", name:"Kwame Osei",     city:"Accra",         quote:"GH₵ 650 invested. Target of GH₵ 4,550 reached in 7 days. Absolutely unbelievable.", amount:"GH₵ 4,550", g1:"#3a2a1a", g2:"#FF9800" },
+    { initials:"AB", name:"Abena Boateng",  city:"Kumasi",        quote:"I love that the signals tell me why to trade, not just what. Very educational.", amount:"GH₵ 8,200", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"YA", name:"Yaw Asante",     city:"Tamale",        quote:"My friends laughed when I told them. They stopped laughing after week two.", amount:"GH₵ 12,000", g1:"#1a2a3a", g2:"#9C27B0" },
+  ],
+  NG:[
+    { initials:"CE", name:"Chukwuemeka Eze", city:"Lagos",        quote:"From Lagos to the world. Razor Chart is the fintech product Nigeria needed.", amount:"₦ 640,000", g1:"#1a3a2a", g2:"#1FD67A" },
+    { initials:"FK", name:"Fatima Kabiru",  city:"Abuja",         quote:"The portfolio dashboard is cleaner than most Nigerian fintech apps I've used.", amount:"₦ 280,000", g1:"#1a2a3a", g2:"#2196F3" },
+    { initials:"BO", name:"Babatunde Ojo",  city:"Port Harcourt", quote:"Withdrew profits twice already. The process is smooth and fast every time.", amount:"₦ 1,150,000", g1:"#3a1a1a", g2:"#FF5722" },
+  ],
+};
+
+const TICKER_DATA = [
+  {pair:"EUR/USD",price:"1.0842",chg:"+0.18%",up:true},{pair:"GBP/USD",price:"1.2634",chg:"-0.24%",up:false},
+  {pair:"USD/JPY",price:"149.82",chg:"+0.31%",up:true},{pair:"XAU/USD",price:"2318.50",chg:"+0.42%",up:true},
+  {pair:"BTC/USD",price:"67,842",chg:"+1.2%",up:true},{pair:"ETH/USD",price:"3,521",chg:"-0.8%",up:false},
+  {pair:"AUD/USD",price:"0.6548",chg:"-0.19%",up:false},{pair:"USD/KES",price:"129.45",chg:"+0.07%",up:true},
+];
+
+let selectedCountry = null;
+
+// ── AUTO-DETECT ──────────────────────────────────────────────────
+function detectCountry() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const m  = COUNTRIES.find(c => tz.includes(c.tz.split("/")[1]));
+    if (m) return m.code;
+  } catch(_) {}
+  return null;
+}
+
+// ── COUNTRY PICKER ────────────────────────────────────────────────
+function buildPicker() {
+  const grid = document.getElementById("cp-grid");
+  if (!grid) return;
+  const detected = detectCountry();
+  grid.innerHTML = COUNTRIES.map(c => `
+    <div class="cp-country${detected===c.code?" selected":""}" onclick="pickCountry('${c.code}',this)">
+      <div class="cp-flag">${c.flag}</div>
+      <div class="cp-info">
+        <div class="cp-name">${c.name}</div>
+        <div class="cp-currency">${c.currency} · ${c.symbol}</div>
+      </div>
+    </div>`).join("");
+  if (detected) {
+    selectedCountry = detected;
+    document.getElementById("cp-continue").disabled = false;
+  }
+}
+
+window.pickCountry = function(code, el) {
+  selectedCountry = code;
+  document.querySelectorAll(".cp-country").forEach(d => d.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("cp-continue").disabled = false;
+};
+
+window.confirmCountry = function() {
+  if (!selectedCountry) return;
+  localStorage.setItem("rc-portal-country", selectedCountry);
+  document.getElementById("cp-overlay").style.display = "none";
+  document.getElementById("portal-body").style.display = "block";
+  initPortal(selectedCountry);
+};
+
+// ── PORTAL INIT ───────────────────────────────────────────────────
+function initPortal(code) {
+  const country = COUNTRIES.find(c => c.code === code) || COUNTRIES[0];
+  // Nav country button
+  const navBtn = document.getElementById("nav-country-btn");
+  if (navBtn) navBtn.textContent = country.flag + " " + country.name;
+  // Hero amount
+  const minKES  = BASE_PLANS[0].deposit;
+  const minLocal = Math.round(minKES * country.rate);
+  const heroAmt  = document.getElementById("hero-min-amount");
+  if (heroAmt) heroAmt.textContent = "Start from " + country.symbol + " " + minLocal.toLocaleString();
+  // Plans
+  renderPlans(country);
+  // Success Stories
+  renderSuccessStories(code, country);
+  // Ticker
+  renderTicker();
+  // CTA sub
+  const ctaSub = document.getElementById("cta-sub");
+  if (ctaSub) ctaSub.innerHTML = `Create your free account in 30 seconds. Start from as little as <strong style="color:var(--gold)">${country.symbol} ${minLocal.toLocaleString()}</strong>.<br>No hidden fees. No monthly charges.`;
+  // Plans sub
+  const plansSub = document.getElementById("plans-sub");
+  if (plansSub) plansSub.textContent = `All amounts shown in ${country.currency}. All plans grow at 28% per day.`;
+}
+
+window.changeCountry = function() {
+  document.getElementById("cp-overlay").style.display = "flex";
+  document.getElementById("portal-body").style.display = "none";
+  buildPicker();
+};
+
+// ── RENDER PLANS ──────────────────────────────────────────────────
+function renderPlans(country) {
+  const grid = document.getElementById("plans-grid");
+  if (!grid) return;
+  grid.innerHTML = BASE_PLANS.map(p => {
+    const dep    = Math.round(p.deposit  * country.rate);
+    const target = Math.round(p.target   * country.rate);
+    const gain   = Math.round((p.target - p.deposit) * country.rate);
+    return `<div class="plan-card${p.popular?" popular":""}">
+      ${p.popular?'<div class="plan-badge">⭐ MOST POPULAR</div>':""}
+      <div class="plan-deposit">${country.symbol} ${dep.toLocaleString()}</div>
+      <div class="plan-target">Target: ${country.symbol} ${target.toLocaleString()}</div>
+      <div class="plan-detail">Profit: ${country.symbol} ${gain.toLocaleString()}<br>Growth: 28% / day</div>
+      <div class="plan-days">${p.days} days</div>
+    </div>`;
+  }).join("");
+}
+
+// ── RENDER TESTIMONIALS ───────────────────────────────────────────
+function renderSuccessStories(code, country) {
+  const grid = document.getElementById("testi-grid");
+  const eye  = document.getElementById("testi-eyebrow");
+  if (!grid) return;
+  if (eye) eye.textContent = country.flag + " " + country.name + " · Investor Wins";
+  const items = TESTIMONIALS[code] || TESTIMONIALS["KE"];
+  const times = ["2 hrs ago","5 hrs ago","1 day ago","3 hrs ago","Yesterday","6 hrs ago"];
+  grid.innerHTML = items.map((t,i) => `
+    <div class="testi-card">
+      <div class="testi-top">
+        <div class="testi-av" style="background:linear-gradient(135deg,${t.g1},${t.g2})">${t.initials}</div>
+        <div>
+          <div class="testi-name">${t.name}</div>
+          <div class="testi-loc">${t.city} · ${times[i] || "Recently"}</div>
+        </div>
+      </div>
+      <p class="testi-quote">"${t.quote}"</p>
+      <div class="testi-bottom">
+        <div class="testi-amount">+${t.amount}</div>
+        <div class="testi-verified" title="Verified Paystack payout"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> VERIFIED</div>
+      </div>
+    </div>`).join("");
+}
+
+// ── RENDER TICKER ─────────────────────────────────────────────────
+function renderTicker() {
+  const track = document.getElementById("ticker-track");
+  if (!track) return;
+  const items = [...TICKER_DATA,...TICKER_DATA];
+  track.innerHTML = items.map(d => `
+    <div class="ticker-item">
+      <span class="t-pair">${d.pair}</span>
+      <span class="t-price">${d.price}</span>
+      <span class="t-chg ${d.up?"up":"dn"}">${d.chg}</span>
+    </div>`).join("");
+}
+
+// ── FAQ TOGGLE ────────────────────────────────────────────────────
+window.toggleFAQ = function(el) {
+  const item = el.parentElement;
+  item.classList.toggle("open");
+};
+
+// ── BOOT ──────────────────────────────────────────────────────────
+(function(){
+  const saved = localStorage.getItem("rc-portal-country");
+  if (saved) {
+    // Return visitor — skip picker, go straight to portal
+    selectedCountry = saved;
+    document.getElementById("cp-overlay").style.display = "none";
+    document.getElementById("portal-body").style.display = "block";
+    initPortal(saved);
+  } else {
+    // First visit — show picker
+    buildPicker();
+  }
+})();
+</script>
+</body>
+</html>
