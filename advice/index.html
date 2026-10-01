@@ -1,1 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Financial Advice for Kenyans | Razor Chart</title>
+<meta name="description" content="Expert financial guides for Kenyans — investing, forex, saving, crypto and financial freedom. Written for the Kenyan market by Razor Chart."/>
+<meta property="og:title" content="Razor Chart Financial Advice — Kenya's Investment Hub"/>
+<meta property="og:description" content="Practical financial education for Kenyans. Investing, saving, forex, crypto and more."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://dankipsangme-cell.github.io/Razor-/advice/"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"Razor Chart Financial Advice","description":"Financial education guides for Kenyan investors","url":"https://dankipsangme-cell.github.io/Razor-/advice/"}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#D4A017;--gold-l:#F5C842;--gold-d:#8a6510;
+  --black:#050608;--dark:#0d0f14;--card:#111420;--card2:#161924;
+  --border:rgba(212,160,23,.18);--border2:rgba(255,255,255,.06);
+  --text:#e8e4d8;--muted:#6b7180;--muted2:#4a4f60;
+  --green:#1FD67A;--red:#F04E4E;
+  --r:14px;--r2:20px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 70% -10%,rgba(212,160,23,.09) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 10% 110%,rgba(212,160,23,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.02) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(5,6,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
+.nav-logo-gem{width:30px;height:30px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center}
+.nav-logo-gem svg{width:14px;height:14px;fill:#000}
+.nav-logo span{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-link{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:600;transition:color .15s}
+.nav-link:hover{color:var(--gold)}
+.nav-cta{padding:9px 20px;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.8rem;font-family:'Syne',sans-serif;border:none;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:0 4px 16px rgba(212,160,23,.25);transition:transform .15s,box-shadow .15s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,160,23,.4)}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:72px 20px 56px;animation:fadeUp .6s ease}
+.hero-gem{width:56px;height:56px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(212,160,23,.45);animation:float 4s ease-in-out infinite}
+.hero-gem svg{width:26px;height:26px;fill:#000}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:5px 16px;font-size:.65rem;font-family:'Space Mono',monospace;color:var(--gold);letter-spacing:.5px;margin-bottom:18px}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.4s infinite}
+.hero h1{font-size:clamp(1.9rem,5vw,3.2rem);font-weight:800;letter-spacing:-.4px;line-height:1.1;margin-bottom:16px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{font-size:.98rem;color:var(--muted);max-width:540px;margin:0 auto 28px;line-height:1.8}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.btn-primary{padding:15px 32px;background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));color:#000;font-weight:800;font-size:.95rem;font-family:'Syne',sans-serif;border:none;border-radius:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(212,160,23,.3);transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(212,160,23,.45)}
+.btn-outline{padding:15px 28px;background:transparent;color:var(--text);font-weight:700;font-size:.92rem;font-family:'Syne',sans-serif;border:1.5px solid var(--border);border-radius:13px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .15s}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.025);border:1px solid var(--border2);border-radius:18px;overflow:hidden;max-width:500px;margin:0 auto}
+.hs{padding:18px 10px;text-align:center;border-right:1px solid var(--border2)}
+.hs:last-child{border-right:none}
+.hs-val{font-size:1.3rem;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace}
+.hs-lbl{font-size:.55rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:3px;letter-spacing:.3px}
+
+/* ARTICLES */
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 64px}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.section-hdr h2{font-size:1.25rem;font-weight:800}
+.section-hdr h2 span{color:var(--gold)}
+.section-hdr small{font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted)}
+.articles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:56px}
+.ac{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--r2);padding:24px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
+.ac::before{content:'';position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(90deg,transparent,rgba(212,160,23,.08),transparent);transition:height .2s}
+.ac:hover{border-color:var(--border);transform:translateY(-4px)}
+.ac:hover::before{height:100%}
+.ac-tag{font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gold);background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:12px;letter-spacing:.3px}
+.ac-title{font-size:.98rem;font-weight:800;line-height:1.35;margin-bottom:9px}
+.ac-excerpt{font-size:.8rem;color:var(--muted);line-height:1.72;flex:1;margin-bottom:16px}
+.ac-footer{display:flex;align-items:center;justify-content:space-between;font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted2);border-top:1px solid var(--border2);padding-top:12px;margin-top:auto}
+.ac-read{color:var(--gold);font-weight:700}
+
+/* FEATURED (first card) */
+.ac-featured{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0;background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));border-color:rgba(212,160,23,.25)}
+.ac-featured::after{content:'⭐ FEATURED GUIDE';position:absolute;top:14px;right:16px;font-size:.58rem;font-family:'Space Mono',monospace;color:var(--gold);background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.25);padding:3px 10px;border-radius:6px;letter-spacing:.5px}
+.ac-featured .ac-title{font-size:1.2rem}
+.ac-featured .ac-excerpt{font-size:.88rem}
+@media(max-width:600px){.ac-featured{grid-template-columns:1fr}}
+
+/* CTA BANNER */
+.cta-banner{background:linear-gradient(135deg,rgba(212,160,23,.12),rgba(212,160,23,.04));border:1px solid rgba(212,160,23,.25);border-radius:24px;padding:44px 28px;text-align:center;position:relative;overflow:hidden}
+.cta-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-l),var(--gold),transparent)}
+.cta-banner h2{font-size:clamp(1.4rem,3.5vw,2rem);font-weight:800;letter-spacing:-.3px;margin-bottom:12px}
+.cta-banner p{color:var(--muted);font-size:.92rem;line-height:1.75;max-width:500px;margin:0 auto 28px}
+.plan-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.plan-pill{background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:7px 14px;font-size:.7rem;font-family:'Space Mono',monospace;color:var(--muted)}
+.plan-pill .amt{color:var(--green);font-weight:700}
+.plan-pill.popular-pill{background:rgba(212,160,23,.08);border-color:rgba(212,160,23,.25);color:var(--gold)}
+
+/* TOPIC FILTER */
+.topic-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.tf-btn{padding:7px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:20px;color:var(--muted);font-size:.72rem;font-family:'Space Mono',monospace;cursor:pointer;transition:all .15s}
+.tf-btn:hover,.tf-btn.active{background:rgba(212,160,23,.1);border-color:rgba(212,160,23,.3);color:var(--gold)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border2);padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace;position:relative;z-index:1}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--muted);text-decoration:none}.footer-links a:hover{color:var(--gold)}
+.disc{font-size:.62rem;color:var(--muted2);text-align:center;padding:12px 24px;line-height:1.6;position:relative;z-index:1}
+@media(max-width:640px){.nav{padding:12px 16px}.hero{padding:48px 16px 40px}.hero-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="../index.html">
+    <div class="nav-logo-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+    <div><span>Razor</span>Chart</div>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="../portal.html">Platform</a>
+    <a class="nav-link" href="../index.html">Sign In</a>
+    <a class="nav-cta" href="../index.html">Start Investing →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow"><span class="eyebrow-dot"></span>KENYA FINANCIAL EDUCATION HUB</div>
+  <div class="hero-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+  <h1>Smart Money Advice<br>for <em>Kenyan Investors</em></h1>
+  <p>Practical, jargon-free financial guides written specifically for the Kenyan market — covering investing, forex trading, saving, crypto and the road to financial freedom.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="how-to-invest-kenya.html">📚 Start Learning</a>
+    <a class="btn-outline" href="../portal.html">View Investment Platform →</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-val">8</div><div class="hs-lbl">GUIDES</div></div>
+    <div class="hs"><div class="hs-val">Free</div><div class="hs-lbl">ALL CONTENT</div></div>
+    <div class="hs"><div class="hs-val">🇰🇪</div><div class="hs-lbl">KENYA-FIRST</div></div>
+    <div class="hs"><div class="hs-val">2025</div><div class="hs-lbl">UPDATED</div></div>
+  </div>
+</div>
+
+<!-- ARTICLES -->
+<div class="wrap">
+
+  <div class="section-hdr">
+    <h2>All <span>Financial Guides</span></h2>
+    <small>8 guides · Updated September 2025</small>
+  </div>
+
+  <!-- Topic filter -->
+  <div class="topic-filter">
+    <button class="tf-btn active" onclick="filterArticles('all',this)">All Topics</button>
+    <button class="tf-btn" onclick="filterArticles('INVESTING',this)">Investing</button>
+    <button class="tf-btn" onclick="filterArticles('FOREX',this)">Forex</button>
+    <button class="tf-btn" onclick="filterArticles('SAVING',this)">Saving</button>
+    <button class="tf-btn" onclick="filterArticles('CRYPTO',this)">Crypto</button>
+    <button class="tf-btn" onclick="filterArticles('INCOME',this)">Passive Income</button>
+    <button class="tf-btn" onclick="filterArticles('MINDSET',this)">Financial Freedom</button>
+  </div>
+
+  <div class="articles-grid" id="articles-grid">
+
+    <!-- FEATURED -->
+    <a class="ac ac-featured" href="how-to-invest-kenya.html" data-tag="INVESTING">
+      <div>
+        <span class="ac-tag">INVESTING</span>
+        <div class="ac-title">How to Invest Money in Kenya (2025 Complete Guide)</div>
+        <div class="ac-excerpt">The most comprehensive guide to investing in Kenya — covering money market funds, NSE stocks, SACCOs, real estate, and digital platforms. Includes a step-by-step action plan, risk comparison table, and common mistakes to avoid. Start from Ksh 500 today.</div>
+        <div class="ac-footer"><span>5 min read · Beginner friendly</span><span class="ac-read">Read guide →</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;padding:0 0 0 24px">
+        <div style="background:var(--card2);border:1px solid var(--border2);border-radius:16px;padding:20px">
+          <div style="font-size:.6rem;font-family:'Space Mono',monospace;color:var(--muted);margin-bottom:12px">WHAT YOU'LL LEARN</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:.8rem"><span style="color:var(--green);font-weight:700">✓</span>Where to start with any budget</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.8rem"><span style="color:var(--green);font-weight:700">✓</span>The 5-step investment framework</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.8rem"><span style="color:var(--green);font-weight:700">✓</span>Best platforms for each goal</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.8rem"><span style="color:var(--green);font-weight:700">✓</span>How to manage risk</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.8rem"><span style="color:var(--green);font-weight:700">✓</span>Mistakes that cost beginners money</div>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <a class="ac" href="best-investment-platforms-kenya.html" data-tag="PLATFORMS">
+      <span class="ac-tag">PLATFORMS</span>
+      <div class="ac-title">Best Investment Platforms in Kenya (2025 Reviewed)</div>
+      <div class="ac-excerpt">Side-by-side comparison of M-Akiba, CIC Money Market Fund, NSE, Treasury Bills, SACCOs and digital platforms. Find the right home for your money.</div>
+      <div class="ac-footer"><span>6 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="forex-trading-beginners-kenya.html" data-tag="FOREX">
+      <span class="ac-tag">FOREX</span>
+      <div class="ac-title">Forex Trading for Beginners in Kenya: The Complete Guide</div>
+      <div class="ac-excerpt">Currency pairs, RSI, MACD, support and resistance, risk management — everything a Kenyan needs to understand forex trading from zero.</div>
+      <div class="ac-footer"><span>7 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="passive-income-ideas-kenya.html" data-tag="INCOME">
+      <span class="ac-tag">INCOME</span>
+      <div class="ac-title">10 Passive Income Ideas That Actually Work in Kenya (2025)</div>
+      <div class="ac-excerpt">Ten proven ways to build income that works while you sleep — from money market dividends to investment platforms, rental income and digital products.</div>
+      <div class="ac-footer"><span>5 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="save-money-kenya.html" data-tag="SAVING">
+      <span class="ac-tag">SAVING</span>
+      <div class="ac-title">How to Save Money in Kenya: The Practical 2025 Guide</div>
+      <div class="ac-excerpt">Saving strategies built around Kenya's unique pressures — harambees, rising food costs, family obligations — with M-PESA tools and the 52-week challenge.</div>
+      <div class="ac-footer"><span>5 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="mobile-money-investment-kenya.html" data-tag="M-PESA">
+      <span class="ac-tag">M-PESA</span>
+      <div class="ac-title">How to Grow Your Money Using Mobile Money in Kenya</div>
+      <div class="ac-excerpt">M-PESA, Mali, M-Akiba, Paystack and mobile SACCOs — the complete guide to building wealth entirely from your phone without visiting a bank branch.</div>
+      <div class="ac-footer"><span>5 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="crypto-kenya.html" data-tag="CRYPTO">
+      <span class="ac-tag">CRYPTO</span>
+      <div class="ac-title">Cryptocurrency Investment in Kenya: What You Need to Know</div>
+      <div class="ac-excerpt">Bitcoin, Ethereum, USDT and the Kenyan regulatory landscape — everything you need to buy, hold and trade crypto safely, including tax implications.</div>
+      <div class="ac-footer"><span>6 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+    <a class="ac" href="financial-freedom-kenya.html" data-tag="MINDSET">
+      <span class="ac-tag">MINDSET</span>
+      <div class="ac-title">Financial Freedom in Kenya: A Realistic Roadmap</div>
+      <div class="ac-excerpt">The four stages from financial security to freedom, the wealth formula, compounding examples, mindset shifts and a concrete 12-month action plan.</div>
+      <div class="ac-footer"><span>6 min read</span><span class="ac-read">Read guide →</span></div>
+    </a>
+
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <div style="font-size:.65rem;font-family:'Space Mono',monospace;color:var(--gold);letter-spacing:.8px;margin-bottom:14px">READY TO ACT ON WHAT YOU LEARN?</div>
+    <h2>Put Knowledge Into Action</h2>
+    <p>Razor Chart lets you invest from Ksh 500, track live forex signals for 20+ pairs, and monitor your portfolio growing daily — all from your phone via M-PESA.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a class="btn-primary" href="../index.html" style="font-size:1rem;padding:16px 36px">🚀 Start Investing on Razor Chart</a>
+      <a class="btn-outline" href="../portal.html">Learn About the Platform →</a>
+    </div>
+    <div class="plan-pills">
+      <span class="plan-pill">Ksh 500 → <span class="amt">Ksh 3,500</span></span>
+      <span class="plan-pill">Ksh 1,000 → <span class="amt">Ksh 5,000</span></span>
+      <span class="plan-pill">Ksh 5,000 → <span class="amt">Ksh 25,000</span></span>
+      <span class="plan-pill popular-pill">⭐ Ksh 10,000 → Ksh 50,000</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div style="font-weight:700">Razor<span style="color:var(--gold)">Chart</span> · Financial Advice</div>
+  <div class="footer-links">
+    <a href="index.html">All Guides</a>
+    <a href="../portal.html">Platform</a>
+    <a href="../index.html">Sign In</a>
+  </div>
+  <div>© 2025 Razor Chart · Kenya</div>
+</footer>
+<div class="disc">Content is for educational purposes only and does not constitute financial advice. Always consult a qualified financial advisor before making investment decisions.</div>
+
+<script>
+function filterArticles(tag, btn) {
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ac').forEach(card => {
+    if (tag === 'all') { card.style.display = ''; return; }
+    const cardTag = card.getAttribute('data-tag') || '';
+    card.style.display = (cardTag === tag || tag === 'all') ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
