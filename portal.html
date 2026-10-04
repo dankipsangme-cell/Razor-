@@ -192,6 +192,31 @@ footer{border-top:1px solid var(--border2);padding:24px;display:flex;align-items
 .footer-links a:hover{color:var(--gold)}
 .footer-disc{font-size:.62rem;color:var(--muted2);text-align:center;padding:12px 24px;line-height:1.6;position:relative;z-index:1}
 
+/* ══ FLOATING SIGNIN BAR ═════════════════════════════════════════ */
+.signin-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(5,6,8,.96);backdrop-filter:blur(24px);border-top:1px solid rgba(212,160,23,.25);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.signin-bar.show{transform:translateY(0)}
+.sb-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-avatar svg{width:16px;height:16px;fill:#000}
+.sb-text{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-text strong{color:var(--text);font-weight:700}
+.sb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sb-signin{padding:9px 20px;background:transparent;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-weight:700;font-size:.8rem;font-family:'Syne',sans-serif;text-decoration:none;transition:all .15s;white-space:nowrap}
+.sb-signin:hover{border-color:var(--gold);color:var(--gold)}
+.sb-register{padding:9px 22px;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.8rem;font-family:'Syne',sans-serif;border:none;border-radius:10px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(212,160,23,.3)}
+.sb-register:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(212,160,23,.45)}
+.sb-close{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:1.1rem;padding:4px;line-height:1;flex-shrink:0;margin-left:4px}
+
+/* ══ ARTICLES SECTION ════════════════════════════════════════════ */
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.adv-card{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--r2);padding:20px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
+.adv-card:hover{border-color:var(--border);transform:translateY(-3px)}
+.adv-tag{font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gold);background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:10px;letter-spacing:.3px}
+.adv-title{font-size:.9rem;font-weight:800;line-height:1.35;margin-bottom:7px}
+.adv-excerpt{font-size:.76rem;color:var(--muted);line-height:1.7;flex:1;margin-bottom:12px}
+.adv-footer{display:flex;align-items:center;justify-content:space-between;font-size:.63rem;font-family:'Space Mono',monospace;color:var(--muted2);border-top:1px solid var(--border2);padding-top:10px;margin-top:auto}
+.adv-read{color:var(--gold);font-weight:700}
+
 /* ══ RESPONSIVE ══════════════════════════════════════════════════ */
 @media(max-width:640px){
   .nav{padding:12px 16px}
@@ -450,10 +475,69 @@ footer{border-top:1px solid var(--border2);padding:24px;display:flex;align-items
 
 <!-- CTA BANNER -->
 <div class="section">
+  <!-- ARTICLES SECTION -->
+  <div style="margin-bottom:48px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="eyebrow">📚 FREE FINANCIAL EDUCATION</div>
+      <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.3px;margin-bottom:10px">Learn Before You <span style="color:var(--gold)">Invest</span></h2>
+      <p style="font-size:.92rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.75">Our free financial guides teach you everything about investing, forex, saving and building wealth in Kenya.</p>
+    </div>
+    <div class="adv-grid">
+      <a class="adv-card" href="advice/how-to-invest-kenya.html">
+        <span class="adv-tag">INVESTING</span>
+        <div class="adv-title">How to Invest Money in Kenya (2025 Guide)</div>
+        <div class="adv-excerpt">Step-by-step guide from Ksh 500 — money market funds, NSE stocks, SACCOs and digital platforms explained simply.</div>
+        <div class="adv-footer"><span>5 min read</span><span class="adv-read">Read →</span></div>
+      </a>
+      <a class="adv-card" href="advice/forex-trading-beginners-kenya.html">
+        <span class="adv-tag">FOREX</span>
+        <div class="adv-title">Forex Trading for Beginners in Kenya</div>
+        <div class="adv-excerpt">Currency pairs, RSI, MACD and live signals explained — everything a Kenyan needs to start trading forex confidently.</div>
+        <div class="adv-footer"><span>7 min read</span><span class="adv-read">Read →</span></div>
+      </a>
+      <a class="adv-card" href="advice/passive-income-ideas-kenya.html">
+        <span class="adv-tag">INCOME</span>
+        <div class="adv-title">10 Passive Income Ideas That Work in Kenya</div>
+        <div class="adv-excerpt">From investment platforms to rental income — ten proven ways to build income that works while you sleep.</div>
+        <div class="adv-footer"><span>5 min read</span><span class="adv-read">Read →</span></div>
+      </a>
+      <a class="adv-card" href="advice/crypto-kenya.html">
+        <span class="adv-tag">CRYPTO</span>
+        <div class="adv-title">Cryptocurrency in Kenya: What You Need to Know</div>
+        <div class="adv-excerpt">Bitcoin, USDT, regulations and risk — the honest guide to crypto for Kenyan investors in 2025.</div>
+        <div class="adv-footer"><span>6 min read</span><span class="adv-read">Read →</span></div>
+      </a>
+      <a class="adv-card" href="advice/financial-freedom-kenya.html">
+        <span class="adv-tag">MINDSET</span>
+        <div class="adv-title">Financial Freedom in Kenya: A Realistic Roadmap</div>
+        <div class="adv-excerpt">The four stages, the wealth formula, and a 12-month action plan for achieving financial independence.</div>
+        <div class="adv-footer"><span>6 min read</span><span class="adv-read">Read →</span></div>
+      </a>
+      <a class="adv-card" href="advice/index.html" style="border-style:dashed;background:rgba(212,160,23,.03);justify-content:center;align-items:center;text-align:center;min-height:140px">
+        <div style="font-size:1.6rem;margin-bottom:8px">📚</div>
+        <div style="font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:4px">View All 8 Guides</div>
+        <div style="font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace">advice.razorchart.co →</div>
+      </a>
+    </div>
+  </div>
+
   <div class="cta-banner">
     <h2>Ready to Start Growing?</h2>
     <p id="cta-sub">Create your free account in 30 seconds. Start from as little as Ksh 500.<br>No hidden fees. No monthly charges. Cancel anytime.</p>
     <a class="btn-primary" href="index.html" style="font-size:1.05rem;padding:18px 40px">🚀 Create Free Account — It's Free</a>
+  </div>
+</div>
+
+<!-- FLOATING SIGNIN BAR -->
+<div class="signin-bar" id="signin-bar">
+  <div class="sb-left">
+    <div class="sb-avatar"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+    <div class="sb-text"><strong>Join 12,400+ investors</strong> already growing on Razor Chart</div>
+  </div>
+  <div class="sb-right">
+    <a class="sb-signin" href="index.html">Sign In</a>
+    <a class="sb-register" href="index.html">Get Started Free →</a>
+    <button class="sb-close" onclick="document.getElementById('signin-bar').style.display='none'" aria-label="Close">✕</button>
   </div>
 </div>
 
@@ -697,6 +781,18 @@ window.toggleFAQ = function(el) {
   const item = el.parentElement;
   item.classList.toggle("open");
 };
+
+// ── FLOATING SIGNIN BAR ───────────────────────────────────────────
+(function(){
+  const bar = document.getElementById("signin-bar");
+  if (!bar) return;
+  // Show after 3 seconds OR after scrolling 40% down
+  setTimeout(() => bar.classList.add("show"), 3000);
+  window.addEventListener("scroll", function handler() {
+    const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    if (scrolled > 0.35) { bar.classList.add("show"); window.removeEventListener("scroll", handler); }
+  }, { passive: true });
+})();
 
 // ── BOOT ──────────────────────────────────────────────────────────
 (function(){
