@@ -168,6 +168,52 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .empty-icon{font-size:2.5rem;margin-bottom:14px}
 .empty-state h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
 .empty-state p{font-size:.85rem;color:var(--muted)}
+
+/* ── WELCOME MODAL ── */
+.wm-overlay{position:fixed;inset:0;z-index:1100;background:rgba(5,6,8,.92);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .35s}
+.wm-overlay.show{opacity:1}
+.wm-box{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:32px 26px;max-width:440px;width:100%;position:relative;overflow:hidden;transform:scale(.92) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.wm-overlay.show .wm-box{transform:scale(1) translateY(0)}
+.wm-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-l),var(--gold),transparent);animation:shimmerLine 3s infinite}
+.wm-gem{width:48px;height:48px;background:linear-gradient(135deg,var(--gold-d),var(--gold-l));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(212,160,23,.4)}
+.wm-gem svg{width:22px;height:22px;fill:#000}
+.wm-title{text-align:center;font-size:1.3rem;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.wm-sub{text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.wm-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.wm-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:14px;padding:13px 16px;transition:border-color .15s;cursor:pointer;text-decoration:none;color:var(--text)}
+.wm-card:hover{border-color:var(--border)}
+.wm-card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.wm-card-body{flex:1}
+.wm-card-title{font-size:.88rem;font-weight:700;margin-bottom:2px}
+.wm-card-sub{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace}
+.wm-card-arrow{color:var(--gold);font-size:.9rem;flex-shrink:0}
+.wm-btn{width:100%;padding:15px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));color:#000;font-weight:800;font-size:.95rem;font-family:'Syne',sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(212,160,23,.3);transition:transform .15s,box-shadow .15s}
+.wm-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,160,23,.45)}
+
+/* ── CHECKLIST ── */
+.qs-checklist{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.qs-item{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted)}
+.qs-item.done{color:var(--text)}
+.qs-check{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.65rem;font-weight:700}
+.qs-check.done{background:rgba(31,214,122,.15);color:var(--green);border:1.5px solid rgba(31,214,122,.3)}
+.qs-check.pending{background:rgba(255,255,255,.04);color:var(--muted2);border:1.5px solid var(--border2)}
+
+/* ── DEMO PORTFOLIO CARD ── */
+.demo-card{background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));border:1.5px dashed rgba(212,160,23,.3);border-radius:var(--r2);padding:22px;margin-bottom:16px;position:relative;overflow:hidden}
+.demo-card::before{content:'DEMO · SIMULATED';position:absolute;top:12px;right:14px;font-size:.55rem;font-family:'Space Mono',monospace;color:var(--gold);background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);padding:2px 8px;border-radius:6px;letter-spacing:.5px}
+.demo-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.demo-label{font-size:.68rem;font-family:'Space Mono',monospace;color:var(--muted)}
+.demo-balance{font-size:1.8rem;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace;letter-spacing:-1px}
+.demo-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.demo-amt{background:rgba(0,0,0,.2);border-radius:8px;padding:8px;text-align:center}
+.demo-amt-label{font-size:.58rem;color:var(--muted2);font-family:'Space Mono',monospace;margin-bottom:3px}
+.demo-amt-val{font-size:.78rem;font-weight:700;font-family:'Space Mono',monospace}
+.demo-progress-wrap{margin-bottom:14px}
+.demo-progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin:6px 0}
+.demo-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:3px;animation:demoGrow 2s ease forwards}
+@keyframes demoGrow{from{width:0}to{width:28%}}
+.demo-activate-btn{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;font-weight:800;font-size:.88rem;font-family:'Syne',sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(212,160,23,.25)}
+.demo-activate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(212,160,23,.4)}
 .inv-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px}
 .inv-card.inv-done{border-color:rgba(31,214,122,.3);background:rgba(31,214,122,.03)}
 .inv-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px}
@@ -790,6 +836,42 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- WELCOME MODAL -->
+<div class="wm-overlay" id="welcome-modal">
+  <div class="wm-box">
+    <div class="wm-gem"><svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2z"/></svg></div>
+    <div class="wm-title">Welcome to Razor Chart 🎉</div>
+    <p class="wm-sub">Your account is live. Here's everything waiting for you — pick where to start.</p>
+    <div class="wm-cards">
+      <div class="wm-card" onclick="closeWelcome('invest')">
+        <div class="wm-card-icon" style="background:rgba(212,160,23,.12)">💰</div>
+        <div class="wm-card-body">
+          <div class="wm-card-title">Activate Your First Investment</div>
+          <div class="wm-card-sub">From Ksh 500 · 28% daily growth · Paystack M-PESA</div>
+        </div>
+        <div class="wm-card-arrow">›</div>
+      </div>
+      <div class="wm-card" onclick="closeWelcome('markets')">
+        <div class="wm-card-icon" style="background:rgba(74,158,255,.1)">📡</div>
+        <div class="wm-card-body">
+          <div class="wm-card-title">View Live Forex Signals</div>
+          <div class="wm-card-sub">EUR/USD · GBP/USD · XAU/USD · 20+ pairs</div>
+        </div>
+        <div class="wm-card-arrow">›</div>
+      </div>
+      <div class="wm-card" onclick="closeWelcome('referrals')">
+        <div class="wm-card-icon" style="background:rgba(31,214,122,.1)">🤝</div>
+        <div class="wm-card-body">
+          <div class="wm-card-title">Refer Friends &amp; Earn</div>
+          <div class="wm-card-sub">Ksh 100 per friend · Ksh 500 after 5 friends</div>
+        </div>
+        <div class="wm-card-arrow">›</div>
+      </div>
+    </div>
+    <button class="wm-btn" onclick="closeWelcome('portfolio')">Go to My Dashboard →</button>
   </div>
 </div>
 
@@ -1685,6 +1767,26 @@ window.doLogout = async () => {
   toast("Signed out","info");
 };
 
+// ── WELCOME MODAL ─────────────────────────────────────────────────
+function showWelcomeModal() {
+  const key = `rc-welcomed-${currentUser?.uid}`;
+  if (localStorage.getItem(key)) return; // already seen
+  const overlay = document.getElementById("welcome-modal");
+  if (!overlay) return;
+  // Small delay so dashboard renders first
+  setTimeout(() => overlay.classList.add("show"), 800);
+  localStorage.setItem(key, "1");
+}
+
+window.closeWelcome = function(tab) {
+  const overlay = document.getElementById("welcome-modal");
+  if (overlay) {
+    overlay.classList.remove("show");
+    setTimeout(() => { overlay.style.display = "none"; }, 350);
+  }
+  if (tab) switchDashTab(tab);
+};
+
 // ── PROFILE ──────────────────────────────────────────────────────
 async function loadProfile(user) {
   const snap = await get(ref(db, `users/${user.uid}/profile`));
@@ -1705,12 +1807,18 @@ async function loadProfile(user) {
 
 // ── INVESTMENTS (real-time) ───────────────────────────────────────
 function listenInvestments(uid) {
+  let firstLoad = true;
   unsubFn = onValue(ref(db, `users/${uid}/investments`), snap => {
     const list = [];
     snap.forEach(c => list.push({id:c.key, ...c.val()}));
     list.sort((a,b)=>(b.startDate||0)-(a.startDate||0));
     renderInvestments(list);
     renderSummary(list);
+    // Show welcome modal on very first load if no investments
+    if (firstLoad) {
+      firstLoad = false;
+      if (!list.length) showWelcomeModal();
+    }
   });
 }
 
@@ -1728,7 +1836,83 @@ function renderSummary(list) {
 function renderInvestments(list) {
   const el = $("inv-list");
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📈</div><h3>No Investments Yet</h3><p>Go to the Invest tab to start earning 28% daily.</p></div>`;
+    const name = currentUser?.displayName?.split(" ")[0] || "there";
+    el.innerHTML = `
+    <!-- DEMO PORTFOLIO CARD -->
+    <div class="demo-card">
+      <div class="demo-top">
+        <div>
+          <div class="demo-label">SIMULATED PORTFOLIO BALANCE</div>
+          <div class="demo-balance">Ksh 32,500</div>
+        </div>
+      </div>
+      <div class="demo-amounts">
+        <div class="demo-amt">
+          <div class="demo-amt-label">DEPOSIT</div>
+          <div class="demo-amt-val" style="color:var(--gold)">Ksh 10,000</div>
+        </div>
+        <div class="demo-amt">
+          <div class="demo-amt-label">PROFIT</div>
+          <div class="demo-amt-val" style="color:var(--green)">+Ksh 22,500</div>
+        </div>
+        <div class="demo-amt">
+          <div class="demo-amt-label">DAYS</div>
+          <div class="demo-amt-val" style="color:var(--text)">12 days</div>
+        </div>
+      </div>
+      <div class="demo-progress-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted)">
+          <span>Progress to target</span><span style="color:var(--gold)">28% — Day 3 of 12</span>
+        </div>
+        <div class="demo-progress-bar"><div class="demo-progress-fill"></div></div>
+        <div style="font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted2)">This is a preview. Activate with real money to start earning.</div>
+      </div>
+      <button class="demo-activate-btn" onclick="switchDashTab('invest')">
+        ⚡ Activate Real Investment — From Ksh 500
+      </button>
+    </div>
+
+    <!-- QUICK START CHECKLIST -->
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:16px">
+      <div style="font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:.5px;margin-bottom:14px">YOUR QUICK START CHECKLIST</div>
+      <div class="qs-checklist">
+        <div class="qs-item done">
+          <div class="qs-check done">✓</div>
+          <span>Account created successfully</span>
+        </div>
+        <div class="qs-item done" id="qs-verified">
+          <div class="qs-check done">✓</div>
+          <span>Welcome bonus credited — Ksh 32,500</span>
+        </div>
+        <div class="qs-item" id="qs-invest">
+          <div class="qs-check pending">○</div>
+          <span style="color:var(--muted)">Activate your first investment plan</span>
+        </div>
+        <div class="qs-item" id="qs-refer">
+          <div class="qs-check pending">○</div>
+          <span style="color:var(--muted)">Refer a friend and earn Ksh 100</span>
+        </div>
+      </div>
+      <button onclick="switchDashTab('invest')" style="width:100%;padding:12px;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.25);border-radius:10px;color:var(--gold);font-weight:700;font-size:.82rem;font-family:'Syne',sans-serif;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(212,160,23,.15)'" onmouseout="this.style.background='rgba(212,160,23,.08)'">
+        Browse Investment Plans →
+      </button>
+    </div>
+
+    <!-- ADVICE CARDS -->
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:18px">
+      <div style="font-size:.65rem;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:.5px;margin-bottom:12px">📚 LEARN WHILE YOU WAIT</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="portal.html#how-it-works" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border2);border-radius:10px;text-decoration:none;color:var(--text);font-size:.8rem;font-weight:600;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <span>📖 How investments work</span><span style="color:var(--gold);font-size:.75rem">Read →</span>
+        </a>
+        <a href="advice/forex-trading-beginners-kenya.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border2);border-radius:10px;text-decoration:none;color:var(--text);font-size:.8rem;font-weight:600;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <span>💱 Forex trading for beginners</span><span style="color:var(--gold);font-size:.75rem">Read →</span>
+        </a>
+        <a href="advice/passive-income-ideas-kenya.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border2);border-radius:10px;text-decoration:none;color:var(--text);font-size:.8rem;font-weight:600;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <span>💰 10 passive income ideas</span><span style="color:var(--gold);font-size:.75rem">Read →</span>
+        </a>
+      </div>
+    </div>`;
     return;
   }
   el.innerHTML = list.map(inv => {
