@@ -1,6 +1,6 @@
 // Razor Chart — Service Worker
-const CACHE = "rc-v3";
-const SHELL = ["index.html", "manifest.json"];
+const CACHE = "rc-v4";
+const SHELL = ["index.html", "manifest.json", "map.html"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
