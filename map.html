@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0b0f">
-<title>Kenya Money Map | Razor Chart</title>
-<meta name="description" content="Map of Kenya's major towns with mobile money and M-Pesa activity, agents, banks and SACCOs.">
+<title>🗺️ Razor Agents | Razor Chart</title>
+<meta name="description" content="Razor Agents: find M-Pesa agents, banks and SACCOs in Kenya and see mobile money activity by town.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -57,6 +57,12 @@ h1 span{color:var(--gold2)}
 .row span:last-child{font-family:'Space Mono',monospace;color:var(--green)}
 .note{display:flex;gap:12px;align-items:flex-start;background:#0f0f18;border:1px solid #23233a;border-radius:18px;padding:14px 16px;font-size:14px;color:var(--mute)}
 .note b{color:var(--gold2)}
+.status{margin-top:12px;font-size:13px;color:var(--gold2);font-family:'Space Mono',monospace}
+.econ{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.econ div{background:#0f0f18;border:1px solid #23233a;border-radius:18px;padding:14px}
+.econ strong{display:block;font-family:Syne,sans-serif;font-size:24px;font-weight:800;color:var(--green)}
+.econ small{color:var(--mute);font-size:12px}
+.src{margin-top:10px;font-size:12px;color:var(--mute)}
 h3{font-family:Syne,sans-serif;font-size:18px;margin-bottom:12px}
 </style>
 </head>
@@ -68,7 +74,7 @@ h3{font-family:Syne,sans-serif;font-size:18px;margin-bottom:12px}
 
 <main>
   <section class="card hero">
-    <h1>Kenya <span>Money Map</span></h1>
+    <h1>🗺️ Razor <span>Agents</span></h1>
     <p>See where mobile money is used most. Tap a town to see its M-Pesa activity, then find agents, banks and SACCOs near you.</p>
   </section>
 
@@ -81,11 +87,12 @@ h3{font-family:Syne,sans-serif;font-size:18px;margin-bottom:12px}
   <section class="card">
     <div class="chips" role="group" aria-label="Map layers">
       <button class="chip" data-layer="towns" aria-pressed="true">Towns</button>
-      <button class="chip" data-layer="agents" aria-pressed="false">M-Pesa agents</button>
-      <button class="chip" data-layer="banks" aria-pressed="false">Banks &amp; SACCOs</button>
+      <button class="chip" data-layer="agents" aria-pressed="true">M-Pesa agents</button>
+      <button class="chip" data-layer="banks" aria-pressed="true">Banks &amp; SACCOs</button>
       <button class="chip" id="locate" aria-pressed="false">Near me</button>
     </div>
     <div id="map" role="application" aria-label="Map of Kenya"></div>
+    <p id="status" class="status">Zoom in to street level to load real agents, banks and SACCOs.</p>
     <div class="legend">
       <span><i class="dot" style="background:#22c55e"></i>Town (bigger = more users)</span>
       <span><i class="dot" style="background:#f0c040"></i>M-Pesa agent</span>
@@ -99,11 +106,17 @@ h3{font-family:Syne,sans-serif;font-size:18px;margin-bottom:12px}
   </section>
 
   <section class="card">
+    <h3>Kenya economy</h3>
+    <div class="econ" id="econ"></div>
+    <p class="src">Source: World Bank, latest available year.</p>
+  </section>
+
+  <section class="card">
     <h3>Towns by mobile money users</h3>
     <div class="list" id="list"></div>
   </section>
 
-  <p class="note"><b>Sample data.</b> The figures in this file are placeholders. Replace them with numbers from the Communications Authority of Kenya, Central Bank of Kenya or FinAccess before you publish.</p>
+  <p class="note"><b>Sample data.</b> Town user numbers are placeholders. Replace them with figures from the Communications Authority of Kenya, Central Bank of Kenya or FinAccess before you publish. Agents, banks and economy figures load live.</p>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -118,24 +131,14 @@ const TOWNS = [
   {name:'Thika',   lat:-1.033, lng:37.069, users:300000,  note:'Industrial town on the Nairobi corridor.'},
   {name:'Garissa', lat:-0.453, lng:39.646, users:150000,  note:'Eastern trading town where mobile money replaces cash.'}
 ];
-const AGENTS = [ // sample points only
-  {name:'Sample M-Pesa agent', lat:-1.283, lng:36.822},
-  {name:'Sample M-Pesa agent', lat:-4.050, lng:39.670},
-  {name:'Sample M-Pesa agent', lat:-0.095, lng:34.760}
-];
-const BANKS = [ // sample points only
-  {name:'Sample bank branch', lat:-1.290, lng:36.810},
-  {name:'Sample SACCO', lat:0.520, lng:35.275},
-  {name:'Sample SACCO', lat:-0.300, lng:36.075}
-];
 /* ================================= */
 
 const fmt = n => n.toLocaleString('en-KE');
 const map = L.map('map',{zoomControl:true}).setView([0.2,37.9],6);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   {attribution:'© OpenStreetMap © CARTO',maxZoom:18}).addTo(map);
 
-const layers = {towns:L.layerGroup().addTo(map), agents:L.layerGroup(), banks:L.layerGroup()};
+const layers = {towns:L.layerGroup().addTo(map), agents:L.layerGroup().addTo(map), banks:L.layerGroup().addTo(map)};
 const max = Math.max(...TOWNS.map(t=>t.users));
 
 function show(t){
@@ -143,16 +146,13 @@ function show(t){
     `<h2>${t.name}</h2><div class="big">${fmt(t.users)}</div><p>Mobile money users (sample)</p>
      <p style="margin-top:8px">${t.note}</p>
      <a class="cta" href="index.html">Start investing</a>`;
-  map.flyTo([t.lat,t.lng],9,{duration:.8});
+  map.flyTo([t.lat,t.lng],13,{duration:.8});
 }
 
 TOWNS.forEach(t=>{
   L.circleMarker([t.lat,t.lng],{radius:8+22*Math.sqrt(t.users/max),color:'#22c55e',weight:2,fillColor:'#22c55e',fillOpacity:.35})
     .bindTooltip(`${t.name}: ${fmt(t.users)}`).on('click',()=>show(t)).addTo(layers.towns);
 });
-const pin = c => L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:${c};border:2px solid #0b0b0f"></div>`,iconSize:[14,14]});
-AGENTS.forEach(a=>L.marker([a.lat,a.lng],{icon:pin('#f0c040')}).bindPopup(a.name).addTo(layers.agents));
-BANKS.forEach(b=>L.marker([b.lat,b.lng],{icon:pin('#60a5fa')}).bindPopup(b.name).addTo(layers.banks));
 
 /* stats + list */
 const sorted = [...TOWNS].sort((a,b)=>b.users-a.users);
@@ -174,13 +174,92 @@ document.querySelectorAll('.chip[data-layer]').forEach(c=>{
     const on = c.getAttribute('aria-pressed')!=='true';
     c.setAttribute('aria-pressed',on);
     on ? layers[c.dataset.layer].addTo(map) : map.removeLayer(layers[c.dataset.layer]);
+    refresh();
   };
+});
+
+
+/* ===== LIVE DATA: OpenStreetMap (Overpass) ===== */
+const esc = x => String(x||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const Q = {
+  agents:'nwr["name"~"m-?pesa",i]({b});nwr["amenity"="money_transfer"]({b});',
+  banks:'nwr["amenity"="bank"]({b});nwr["amenity"="atm"]({b});nwr["name"~"sacco",i]({b});'
+};
+const COLOR = {agents:'#d4a017', banks:'#2563eb'};
+const status = document.getElementById('status');
+let timer, ctrl;
+
+async function load(key){
+  const b = map.getBounds();
+  const box = [b.getSouth(),b.getWest(),b.getNorth(),b.getEast()].join(',');
+  const q = `[out:json][timeout:25];(${Q[key].replace(/\{b\}/g,box)});out center 400;`;
+  const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q),signal:ctrl.signal});
+  const data = await r.json();
+  layers[key].clearLayers();
+  let n = 0;
+  data.elements.forEach(e=>{
+    const lat = e.lat ?? e.center?.lat, lng = e.lon ?? e.center?.lon;
+    if(lat==null) return;
+    const name = e.tags?.name || (key==='agents' ? 'Money transfer point' : 'Bank / SACCO / ATM');
+    L.circleMarker([lat,lng],{radius:7,color:'#fff',weight:2,fillColor:COLOR[key],fillOpacity:1})
+      .bindPopup(`<b>${esc(name)}</b>${e.tags?.operator?'<br>'+esc(e.tags.operator):''}`).addTo(layers[key]);
+    n++;
+  });
+  return n;
+}
+
+function refresh(){
+  clearTimeout(timer);
+  timer = setTimeout(async ()=>{
+    if(ctrl) ctrl.abort();
+    ctrl = new AbortController();
+    const keys = ['agents','banks'].filter(k=>map.hasLayer(layers[k]));
+    if(!keys.length){status.textContent='';return;}
+    if(map.getZoom()<12){
+      keys.forEach(k=>layers[k].clearLayers());
+      status.textContent='Zoom in to street level to load real agents, banks and SACCOs.';
+      return;
+    }
+    status.textContent='Loading from OpenStreetMap...';
+    try{
+      const out = [];
+      for(const k of keys) out.push(`${await load(k)} ${k==='agents'?'agents':'banks/SACCOs'}`);
+      status.textContent = 'Found in this view: '+out.join(', ')+'. Coverage depends on OpenStreetMap contributors.';
+    }catch(err){
+      if(err.name!=='AbortError') status.textContent='Could not load map data. Check your connection and try again.';
+    }
+  },700);
+}
+map.on('moveend',refresh);
+refresh();
+
+/* ===== LIVE DATA: World Bank economy ===== */
+const IND = [
+  ['FP.CPI.TOTL.ZG','Inflation','%'],
+  ['NY.GDP.MKTP.KD.ZG','GDP growth','%'],
+  ['NY.GDP.PCAP.CD','GDP per person','USD'],
+  ['SL.UEM.TOTL.ZS','Unemployment','%'],
+  ['FR.INR.LEND','Lending rate','%'],
+  ['FX.OWN.TOTL.ZS','Adults with an account','%']
+];
+const econ = document.getElementById('econ');
+IND.forEach(async ([code,label,unit])=>{
+  const box = document.createElement('div');
+  box.innerHTML = `<strong>...</strong><small>${label}</small>`;
+  econ.appendChild(box);
+  try{
+    const r = await fetch(`https://api.worldbank.org/v2/country/KEN/indicator/${code}?format=json&mrnev=1`);
+    const j = await r.json();
+    const d = j[1][0];
+    const v = unit==='USD' ? '$'+Math.round(d.value).toLocaleString('en-KE') : d.value.toFixed(1)+'%';
+    box.innerHTML = `<strong>${v}</strong><small>${label} (${d.date})</small>`;
+  }catch(e){ box.innerHTML = `<strong>n/a</strong><small>${label}</small>`; }
 });
 
 /* near me */
 let me;
 document.getElementById('locate').onclick=()=>{
-  map.locate({setView:true,maxZoom:13});
+  map.locate({setView:true,maxZoom:15});
 };
 map.on('locationfound',e=>{
   if(me) map.removeLayer(me);
