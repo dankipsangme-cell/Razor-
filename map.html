@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0b0f">
+<title>Kenya Money Map | Razor Chart</title>
+<meta name="description" content="Map of Kenya's major towns with mobile money and M-Pesa activity, agents, banks and SACCOs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+:root{
+  --bg:#0b0b0f; --card:#14141f; --line:#2a2412; --gold:#d4a017; --gold2:#f0c040;
+  --green:#22c55e; --text:#e8e6df; --mute:#8d8a80;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;
+  background-image:linear-gradient(rgba(212,160,23,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.04) 1px,transparent 1px);
+  background-size:40px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#0f0f14;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1000}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:Syne,sans-serif;font-weight:800;font-size:22px;color:var(--text)}
+.brand b{color:var(--gold2)}
+.hex{width:34px;height:34px;background:var(--gold);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:grid;place-items:center}
+.hex i{border:6px solid transparent;border-bottom:10px solid #111;border-top:0;margin-top:2px}
+.nav{display:flex;gap:8px}
+.nav a{color:var(--mute);text-decoration:none;font-size:14px;padding:8px 14px;border:1px solid #2b2b33;border-radius:12px;background:#17171d}
+.nav a:hover,.nav a:focus-visible{color:var(--gold2);border-color:var(--gold);outline:none}
+main{max-width:900px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:16px}
+.card{background:var(--card);border:1px solid #23233a;border-radius:24px;padding:20px}
+.hero{background:linear-gradient(160deg,#241c07,#14110a);border-color:var(--line)}
+h1{font-family:Syne,sans-serif;font-weight:800;font-size:clamp(26px,7vw,40px);line-height:1.1;margin-bottom:8px}
+h1 span{color:var(--gold2)}
+.hero p{color:var(--mute);max-width:52ch}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#0f0f18;border:1px solid #23233a;border-radius:18px;padding:14px 8px;text-align:center}
+.stat strong{display:block;font-family:Syne,sans-serif;font-size:clamp(20px,6vw,30px);font-weight:800}
+.stat:nth-child(1) strong{color:var(--gold2)} .stat:nth-child(2) strong{color:var(--green)} .stat:nth-child(3) strong{color:var(--gold2)}
+.stat small{font-family:'Space Mono',monospace;font-size:11px;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{font:inherit;font-size:14px;color:var(--mute);background:#17171d;border:1px solid #2b2b33;border-radius:999px;padding:9px 16px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--gold);color:#111;border-color:var(--gold);font-weight:700}
+.chip:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#map{height:62vh;min-height:360px;border-radius:20px;border:1px solid var(--line);background:#0b0b0f}
+.leaflet-container{font-family:'Space Grotesk',sans-serif}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#14141f;color:var(--text);border:1px solid var(--line)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--mute)}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+#detail h2{font-family:Syne,sans-serif;font-size:24px;color:var(--gold2)}
+#detail .big{font-family:Syne,sans-serif;font-size:34px;font-weight:800;color:var(--green)}
+#detail p{color:var(--mute)}
+.cta{display:inline-block;margin-top:14px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#111;font-family:Syne,sans-serif;font-weight:800;text-decoration:none;padding:13px 22px;border-radius:999px}
+.list{display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;align-items:center;width:100%;font:inherit;color:var(--text);background:#0f0f18;border:1px solid #23233a;border-radius:16px;padding:13px 16px;cursor:pointer;text-align:left}
+.row:hover,.row:focus-visible{border-color:var(--gold);outline:none}
+.row span:last-child{font-family:'Space Mono',monospace;color:var(--green)}
+.note{display:flex;gap:12px;align-items:flex-start;background:#0f0f18;border:1px solid #23233a;border-radius:18px;padding:14px 16px;font-size:14px;color:var(--mute)}
+.note b{color:var(--gold2)}
+h3{font-family:Syne,sans-serif;font-size:18px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html" aria-label="Razor Chart home"><span class="hex"><i></i></span>Razor <b>Chart</b></a>
+  <nav class="nav"><a href="index.html">Home</a><a href="portal.html">Portal</a></nav>
+</header>
+
+<main>
+  <section class="card hero">
+    <h1>Kenya <span>Money Map</span></h1>
+    <p>See where mobile money is used most. Tap a town to see its M-Pesa activity, then find agents, banks and SACCOs near you.</p>
+  </section>
+
+  <section class="stats" aria-label="Summary">
+    <div class="stat"><strong id="sTowns">0</strong><small>Towns</small></div>
+    <div class="stat"><strong id="sUsers">0</strong><small>Mobile money users</small></div>
+    <div class="stat"><strong id="sTop">-</strong><small>Top town</small></div>
+  </section>
+
+  <section class="card">
+    <div class="chips" role="group" aria-label="Map layers">
+      <button class="chip" data-layer="towns" aria-pressed="true">Towns</button>
+      <button class="chip" data-layer="agents" aria-pressed="false">M-Pesa agents</button>
+      <button class="chip" data-layer="banks" aria-pressed="false">Banks &amp; SACCOs</button>
+      <button class="chip" id="locate" aria-pressed="false">Near me</button>
+    </div>
+    <div id="map" role="application" aria-label="Map of Kenya"></div>
+    <div class="legend">
+      <span><i class="dot" style="background:#22c55e"></i>Town (bigger = more users)</span>
+      <span><i class="dot" style="background:#f0c040"></i>M-Pesa agent</span>
+      <span><i class="dot" style="background:#60a5fa"></i>Bank / SACCO</span>
+    </div>
+  </section>
+
+  <section class="card" id="detail" aria-live="polite">
+    <h2>Pick a town</h2>
+    <p>Tap a circle on the map or a town below to see details.</p>
+  </section>
+
+  <section class="card">
+    <h3>Towns by mobile money users</h3>
+    <div class="list" id="list"></div>
+  </section>
+
+  <p class="note"><b>Sample data.</b> The figures in this file are placeholders. Replace them with numbers from the Communications Authority of Kenya, Central Bank of Kenya or FinAccess before you publish.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+/* ===== EDIT YOUR DATA HERE ===== */
+const TOWNS = [
+  {name:'Nairobi', lat:-1.286, lng:36.817, users:3000000, note:'Kenya\'s financial hub. Highest M-Pesa agent density in the country.'},
+  {name:'Mombasa', lat:-4.043, lng:39.668, users:900000,  note:'Coastal trade and tourism drive high daily transactions.'},
+  {name:'Kisumu',  lat:-0.091, lng:34.768, users:500000,  note:'Lake region centre with strong agent and SACCO activity.'},
+  {name:'Nakuru',  lat:-0.303, lng:36.080, users:450000,  note:'Fast-growing Rift Valley town and farming market hub.'},
+  {name:'Eldoret', lat:0.514,  lng:35.270, users:400000,  note:'North Rift trade centre with many SACCOs.'},
+  {name:'Thika',   lat:-1.033, lng:37.069, users:300000,  note:'Industrial town on the Nairobi corridor.'},
+  {name:'Garissa', lat:-0.453, lng:39.646, users:150000,  note:'Eastern trading town where mobile money replaces cash.'}
+];
+const AGENTS = [ // sample points only
+  {name:'Sample M-Pesa agent', lat:-1.283, lng:36.822},
+  {name:'Sample M-Pesa agent', lat:-4.050, lng:39.670},
+  {name:'Sample M-Pesa agent', lat:-0.095, lng:34.760}
+];
+const BANKS = [ // sample points only
+  {name:'Sample bank branch', lat:-1.290, lng:36.810},
+  {name:'Sample SACCO', lat:0.520, lng:35.275},
+  {name:'Sample SACCO', lat:-0.300, lng:36.075}
+];
+/* ================================= */
+
+const fmt = n => n.toLocaleString('en-KE');
+const map = L.map('map',{zoomControl:true}).setView([0.2,37.9],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  {attribution:'© OpenStreetMap © CARTO',maxZoom:18}).addTo(map);
+
+const layers = {towns:L.layerGroup().addTo(map), agents:L.layerGroup(), banks:L.layerGroup()};
+const max = Math.max(...TOWNS.map(t=>t.users));
+
+function show(t){
+  document.getElementById('detail').innerHTML =
+    `<h2>${t.name}</h2><div class="big">${fmt(t.users)}</div><p>Mobile money users (sample)</p>
+     <p style="margin-top:8px">${t.note}</p>
+     <a class="cta" href="index.html">Start investing</a>`;
+  map.flyTo([t.lat,t.lng],9,{duration:.8});
+}
+
+TOWNS.forEach(t=>{
+  L.circleMarker([t.lat,t.lng],{radius:8+22*Math.sqrt(t.users/max),color:'#22c55e',weight:2,fillColor:'#22c55e',fillOpacity:.35})
+    .bindTooltip(`${t.name}: ${fmt(t.users)}`).on('click',()=>show(t)).addTo(layers.towns);
+});
+const pin = c => L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:${c};border:2px solid #0b0b0f"></div>`,iconSize:[14,14]});
+AGENTS.forEach(a=>L.marker([a.lat,a.lng],{icon:pin('#f0c040')}).bindPopup(a.name).addTo(layers.agents));
+BANKS.forEach(b=>L.marker([b.lat,b.lng],{icon:pin('#60a5fa')}).bindPopup(b.name).addTo(layers.banks));
+
+/* stats + list */
+const sorted = [...TOWNS].sort((a,b)=>b.users-a.users);
+document.getElementById('sTowns').textContent = TOWNS.length;
+document.getElementById('sUsers').textContent = (TOWNS.reduce((s,t)=>s+t.users,0)/1e6).toFixed(1)+'M';
+document.getElementById('sTop').textContent = sorted[0].name;
+const list = document.getElementById('list');
+sorted.forEach(t=>{
+  const b = document.createElement('button');
+  b.className='row';
+  b.innerHTML=`<span>${t.name}</span><span>${fmt(t.users)}</span>`;
+  b.onclick=()=>{show(t);document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'})};
+  list.appendChild(b);
+});
+
+/* layer chips */
+document.querySelectorAll('.chip[data-layer]').forEach(c=>{
+  c.onclick=()=>{
+    const on = c.getAttribute('aria-pressed')!=='true';
+    c.setAttribute('aria-pressed',on);
+    on ? layers[c.dataset.layer].addTo(map) : map.removeLayer(layers[c.dataset.layer]);
+  };
+});
+
+/* near me */
+let me;
+document.getElementById('locate').onclick=()=>{
+  map.locate({setView:true,maxZoom:13});
+};
+map.on('locationfound',e=>{
+  if(me) map.removeLayer(me);
+  me = L.circleMarker(e.latlng,{radius:9,color:'#f0c040',fillColor:'#f0c040',fillOpacity:.9}).addTo(map).bindPopup('You are here').openPopup();
+});
+map.on('locationerror',()=>alert('Location is off. Allow location access in your browser to use this.'));
+</script>
+</body>
+</html>
